@@ -44,6 +44,30 @@ RUN sh zed-sdk.run -- silent skip_tools skip_cuda
 # Install rosbridge so ui can communicate with ros
 RUN apt-get install -y ros-humble-rosbridge-server
 
+# Install GT-SAM
+RUN apt-get update && apt-get install -y ros-humble-gtsam
+# RUN apt-get update && apt-get install -y libgtsam-dev
+
+# Install G20
+# RUN apt-get update && apt-get install -y libg2o-dev
+# Install dependencies required for building g2o
+RUN apt-get update && apt-get install -y \
+    cmake \
+    build-essential \
+    git \
+    libeigen3-dev \
+    libsuitesparse-dev \
+    qt5-qmake \
+    libqt5widgets5
+
+# Clone and build g2o
+RUN git clone https://github.com/RainerKuemmerle/g2o.git /root/g2o && \
+    cd /root/g2o && \
+    mkdir build && cd build && \
+    cmake .. && \
+    make -j$(nproc) && \
+    make install
+
 
 # Get packages -------------------------------------------------------------------------------------------
 WORKDIR /dev_ws/src
@@ -77,7 +101,7 @@ RUN . /opt/ros/humble/setup.sh \
     && apt-get update \
     && apt-get install -y python3-pip \
     && pip3 install 'transforms3d==0.4.1' \
-    && apt-get install ros-humble-tf-transformations \
+    && apt-get install -y ros-humble-tf-transformations \
     && apt install -y xauth \
     && apt-get -y install tmux \
     && chmod +x src/ai-navigation/motor_control/resource/docker_startup_script.sh \
