@@ -50,4 +50,10 @@ Once you open the container in vscode, opening a terminal (through VSCode) will 
 `docker compose run <backend/frontend> tmux` will run `tmux` in a container. Use `exit` to close it.
 
 
+# Debugging / Manual Use (for those who want to run it with a little more control)
+docker ps -a / docker ls -a    :    List all containers (regardless of status)
+docker images                  :    List details
+
+# Removal / Manual Clean Up
+
 
