@@ -48,12 +48,24 @@ Once you open the container in vscode, opening a terminal (through VSCode) will 
 
 ## TMUX (maybe to use `nvim` or `nano`)
 `docker compose run <backend/frontend> tmux` will run `tmux` in a container. Use `exit` to close it.
+'docker exec -it <container id> /bin/bash' will start a bash terminal inside the specified container
 
 
 # Debugging / Manual Use (for those who want to run it with a little more control)
-docker ps -a / docker ls -a    :    List all containers (regardless of status)
-docker images                  :    List details
+'docker ps -a / docker ls -a'                     :    List all containers (regardless of status)
+'docker images'                                   :    List all image details
+'docker build -t <image_name> <dockerfile_path>'  :    Manually rebuild a container
+'docker start -ai <container id>'                 :    Manually start a container
 
 # Removal / Manual Clean Up
+'docker rm <Container id or name>'  :  Remove specified container
+'docker rmi <Image id or name>'     :  Remove specified image
 
+# Notes about manual Building
+Manually start the container and connect to a terminal in it using the above commands.
+cd to dev_ws/src
+'colcon build --symlink-install'
+'source install/setup.bash'
+Builds it manually -- it is not always built or sourced due to the nature of docker compose
+Try this if you feel like your edits aren't affecting the docker.
 
