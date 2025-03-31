@@ -1,5 +1,4 @@
 volumes:
-  dev_ws:
   ui:
 
 services:
@@ -17,7 +16,7 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix
       - $HOME/.Xauthority:/root/.Xauthority
       - /dev:/dev
-      - dev_ws:/dev_ws
+      - /home/jacart2/mill25jx/dev_ws:/dev_ws
     privileged: true
     runtime: nvidia
     network_mode: "host"

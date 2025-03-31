@@ -68,45 +68,6 @@ RUN git clone https://github.com/RainerKuemmerle/g2o.git /root/g2o && \
     make -j$(nproc) && \
     make install
 
-
-# Get packages -------------------------------------------------------------------------------------------
-WORKDIR /dev_ws/src
-RUN git clone https://github.com/rsasaki0109/lidar_localization_ros2.git
-RUN git clone https://github.com/rsasaki0109/ndt_omp_ros2.git
-RUN git clone --branch display_global_path https://github.com/JACart2/ai-navigation.git
-RUN git clone --recursive --depth 1 --branch humble-v4.0.8 https://github.com/stereolabs/zed-ros2-wrapper.git 
-RUN git clone https://github.com/stereolabs/zed-ros2-examples.git
-RUN apt-get update
-RUN apt-get -y install ros-humble-velodyne
-WORKDIR /dev_ws/
-
-
-# Initialize rosdep
-RUN rosdep init && rosdep update
-
-# build
-RUN /bin/bash -c "source /opt/ros/humble/setup.bash && \
-  apt-get update -y || true && \
-  rosdep install --from-paths src --ignore-src -r -y && \
-  colcon build --parallel-workers $(nproc) --symlink-install \
-  --event-handlers console_direct+ --base-paths src \
-  --cmake-args ' -DCMAKE_BUILD_TYPE=Release' \
-  ' -DCMAKE_LIBRARY_PATH=/usr/local/cuda/lib64/stubs' \
-  ' -DCMAKE_CXX_FLAGS="-Wl,--allow-shlib-undefined"' "
-
-
-# Can these dependencies below be defined in the respective packages package.xml and then installed with rosdep?
-#why transforms3d==0.4.1? on 06/17/2024 0.4.2 was released and caused issues. More specifically when running ros nodes "Please install transforms3d by hand" was outputed but doing so didn't fix anything.
-RUN . /opt/ros/humble/setup.sh \
-    && apt-get update \
-    && apt-get install -y python3-pip \
-    && pip3 install 'transforms3d==0.4.1' \
-    && apt-get install -y ros-humble-tf-transformations \
-    && apt install -y xauth \
-    && apt-get -y install tmux \
-    && chmod +x src/ai-navigation/motor_control/resource/docker_startup_script.sh \
-    && ./src/ai-navigation/motor_control/resource/docker_startup_script.sh
-
 # nvidia-container-runtime
 ENV NVIDIA_VISIBLE_DEVICES \
     ${NVIDIA_VISIBLE_DEVICES:-all}
