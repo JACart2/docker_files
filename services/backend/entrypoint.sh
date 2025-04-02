@@ -12,7 +12,7 @@ source "/dev_ws/install/setup.bash" --
 echo 'source "/opt/ros/humble/setup.bash" ' >> ~/.bashrc 
 echo 'source "/dev_ws/install/setup.bash" ' >> ~/.bashrc 
 
-# Environment settings that need src to be used
+# Environment settings that need to reference source code
 
 PKG="/dev_ws/src/ai-navigation/motor_control"
 
