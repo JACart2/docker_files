@@ -33,3 +33,15 @@ services:
       - $HOME/.ssh:/root/.ssh
       - $HOME/.gitconfig:/root/.gitconfig
       - ui:/ui
+  fer:
+    build:
+      context: ./services/fer/
+      dockerfile: ./Dockerfile
+    environment:
+      - RUN_FER
+    volumes:
+      - "/home/obstacle/Desktop/OA_SECRET.txt:/mnt/OA_SECRET.txt"
+    privileged: true
+    network_mode: "host"
+    stdin_open: true
+    tty: true
