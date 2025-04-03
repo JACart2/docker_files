@@ -8,7 +8,7 @@ cd /dev_ws
 rosdep update
 rosdep install --from-paths /dev_ws/src --ignore-src -r -y 
 colcon build --symlink-install
-source "/dev_ws/install/setup.bash" --
+source install/setup.bash
 echo 'source "/opt/ros/humble/setup.bash" ' >> ~/.bashrc 
 echo 'source "/dev_ws/install/setup.bash" ' >> ~/.bashrc 
 
