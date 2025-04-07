@@ -18,7 +18,9 @@ Dockerfile and scripts for complete setup and operation of a JACart.
 An attempt was made to write scripts to do this for you (still in the ./require directory). It would be nice if somone could get that working.
 
 ## 2. Set up workspace
-Clone docker_files and create a folder named dev_ws in the same directory. Change the working directory to dev_ws and run `../docker_files/initSrc.sh`. This will initialize source files.
+1. Clone the docker_files repo
+1. Create a folder named dev_ws in the same directory as docker_files
+1. Clone all repos that are currently under development into dev_ws (For now that is probably just the ai-navigation repo)
 
 # Running
 `bash ./run.sh` will run everything for full operation of the cart including initializing the host. This does the steps below for you. This not praticial for development use.
@@ -38,8 +40,8 @@ Clone docker_files and create a folder named dev_ws in the same directory. Chang
 
 `bash ./dev-run.sh` will create the containers but override the entry commands so they don't start anything. You should run this before using any of the options below.
 
-## Basic structure
-Any ROS packages that you want to actively work on should be put in dev_ws. Any ROS packages that are not under development (ie, dependencies) are stored in the backend docker image in the dependency_ws folder. Packages in the dev_ws folder will be build by the backend entry script whenever the container runs.
+## Project structure
+Any ROS packages that you want to actively work on should be put in dev_ws. Any ROS packages that are not under development (ie, dependencies) are stored in the backend docker image in the dependency_ws folder. To add dependencies, go into the Dockerfile and simply clone it in the same place as the other dependencies. These dependencies will built and be baked into the docker image. ROS2 packages that are in the dev_ws folder will be build by the backend entry script whenever the container runs. If you would like to do development inside a container, you may also manually build from there.
 
 ## VSCode
 
@@ -53,14 +55,12 @@ Once you open the container in vscode, opening a terminal (through VSCode) will 
 ## TMUX (maybe to use `nvim` or `nano`)
 `docker compose run <backend/frontend> tmux` will run `tmux` in a container. Use `exit` to close it.
 
-## Debugging
+## Convinient docker commands
 - `docker run -it <image> /bin/bash`                :    Launch an image with a bash terminal (Simple way to check file structure)
 - `docker exec -it <container id> /bin/bash`        :    Open a bash terminal inside a running container
 - `docker container ls -a`                          :    List all containers (regardless of status)
 - `docker images`                                   :    List all image details
 - `docker build -t <image_name> <dockerfile_path>`  :    Manually rebuild a container
 - `docker start -ai <container id>`                 :    Manually start a container
-
-## Manual Clean Up
-- `docker rm <Container id or name>`  :  Remove specified container
-- `docker rmi <Image id or name>`     :  Remove specified image
+- `docker rm <Container id or name>`                :    Remove specified container
+- `docker rmi <Image id or name>`                   :    Remove specified image
