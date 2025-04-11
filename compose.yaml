@@ -42,6 +42,7 @@ services:
     volumes:
       - "/home/obstacle/Desktop/OA_SECRET.txt:/mnt/OA_SECRET.txt"
     privileged: true
+    runtime: nvidia
     network_mode: "host"
     stdin_open: true
     tty: true
