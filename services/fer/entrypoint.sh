@@ -17,7 +17,7 @@ else
     echo "RUNNING FER"
 
     # this will run the emotiondetection script
-    cd FER_DataCollection
+    cd ~/src/FER_DataCollection
     cd modified_legacy_code
     python3 EmotionDetection.py
 fi
