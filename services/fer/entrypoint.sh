@@ -11,13 +11,13 @@ echo 'source "/opt/ros/humble/setup.bash" ' >> ~/.bashrc
 echo 'source "/dev_ws/install/setup.bash" ' >> ~/.bashrc 
 
 echo "RUN_FER is set to: $RUN_FER"
-if [ "$RUN_FER" == "false"  ]; then
-    echo "NOT RUNNING FER"
-else
+if [ "$RUN_FER" == "true"  ]; then
     echo "RUNNING FER"
 
     # this will run the emotiondetection script
     cd ~/src/FER_DataCollection
     cd modified_legacy_code
     python3 EmotionDetection.py
+else
+    echo "NOT RUNNING FER"
 fi

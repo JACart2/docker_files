@@ -40,7 +40,7 @@ services:
     environment:
       - RUN_FER
     volumes:
-      - "/home/obstacle/Desktop/OA_SECRET.txt:/mnt/OA_SECRET.txt"
+      - "/home/obstacle/Desktop/OA_SECRET.txt:/mnt/OA_SECRET.txt" #update with path on actual machine
     privileged: true
     runtime: nvidia
     network_mode: "host"
