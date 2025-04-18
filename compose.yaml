@@ -37,7 +37,7 @@ services:
       context: ./services/fer/
       dockerfile: ./Dockerfile
     environment:
-      - RUN_FER
+      - FER_COMMAND
     volumes:
       - "/home/obstacle/Desktop/OA_SECRET.txt:/mnt/OA_SECRET.txt" #update with path on actual machine
     privileged: true
