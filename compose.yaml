@@ -39,8 +39,9 @@ services:
       dockerfile: ./Dockerfile
     environment:
       - FER_COMMAND
+      - /home/jacart/jacart-project/dev_ws:/dev_ws # think about getting specific to the repo
     volumes:
-      - "/home/obstacle/Desktop/OA_SECRET.txt:/mnt/OA_SECRET.txt" #update with path on actual machine
+      - /home/jacart/jacart-project/dev_ws/FER_DataCollection/OA_SECRET.txt:/mnt/OA_SECRET.txt # grabbing OA_secret
     privileged: true
     runtime: nvidia
     network_mode: "host"
