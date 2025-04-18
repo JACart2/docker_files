@@ -12,10 +12,6 @@ RUN apt-get install --no-install-recommends -y locales && \
 	export LANG=en_US.UTF-8 && \
 	locale
 
-# tells OpenGL to not use gpu acceleration - this was causing conflicts with rviz
-# RUN echo "export LIBGL_ALWAYS_SOFTWARE=1" >> /etc/skel/.bashrc
-# RUN echo "export LIBGL_ALWAYS_SOFTWARE=1" >> /root/.bashrc
-
 # Setup Sources
 RUN apt-get install --no-install-recommends -y software-properties-common && \
 	add-apt-repository universe && \
@@ -88,7 +84,6 @@ RUN . /opt/ros/humble/setup.sh \
     && sudo apt-get install -y python3-pip \
     && pip3 install 'transforms3d==0.4.1' \
     && sudo apt-get install -y ros-humble-tf-transformations \
-    && sudo apt-get install -y ros-humble-pointcloud-to-laserscan \
     && sudo apt install -y xauth
 
 # Install and build ros dependencies
