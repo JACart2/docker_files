@@ -13,6 +13,6 @@ open_browser_when_ready () {
 	open http://localhost:5173
 }
 
-open_browser_when_ready & docker compose up --remove-orphans --force-recreate 
+open_browser_when_ready & docker compose up --build --remove-orphans --force-recreate 
 
 
