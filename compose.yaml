@@ -12,11 +12,12 @@ services:
       - $HOME/.ssh:/root/.ssh
       - $HOME/.gitconfig:/root/.gitconfig
       - DISPLAY
+      - XDG_RUNTIME_DIR
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
       - $HOME/.Xauthority:/root/.Xauthority
       - /dev:/dev
-      - ../dev_ws:/dev_ws
+      - /home/jacart/jacart-project/dev_ws:/dev_ws
     privileged: true
     runtime: nvidia
     network_mode: "host"
