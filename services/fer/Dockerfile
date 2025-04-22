@@ -23,16 +23,6 @@ RUN apt-get update && \
 ENV NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES:-all}
 ENV NVIDIA_DRIVER_CAPABILITIES=${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics,compute,video,utility
 
-# setting up the codebase
-WORKDIR /src
-RUN git clone https://github.com/JACart2/FER_DataCollection.git && \
-  cd FER_DataCollection && \
-  git fetch && \
-  git pull
-
-WORKDIR /
-
-
 # ROS2 https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html -------------------------------------------------------
 
 RUN apt update
@@ -78,10 +68,11 @@ RUN wget -O zed-sdk.run https://download.stereolabs.com/zedsdk/4.0/cu117/ubuntu2
 
 # SETTING UP ROS2
 # Get packages -------------------------------------------------------------------------------------------
-WORKDIR /dev_ws/src
-RUN git clone --recursive --depth 1 --branch humble-v4.0.8 https://github.com/stereolabs/zed-ros2-wrapper.git && \
-  git clone https://github.com/stereolabs/zed-ros2-examples.git && \
-  apt-get update
+
+  # WORKDIR /dev_ws/src
+# RUN git clone --recursive --depth 1 --branch humble-v4.0.8 https://github.com/stereolabs/zed-ros2-wrapper.git && \
+#   git clone https://github.com/stereolabs/zed-ros2-examples.git && \
+#   apt-get update
 WORKDIR /dev_ws/
 
 # Initialize rosdep
@@ -122,6 +113,9 @@ RUN pip3 install moviepy==1.0.3 && \
   pip3 install python-dotenv && \
   pip3 install openai && \
   pip3 install mysql-connector-python
+
+
+WORKDIR /dev_ws/src/FER_DataCollection/modified_legacy_code
 
 # # initialize entrypoint, this gets access to the secret on the machine
 COPY entrypoint.sh /entrypoint.sh

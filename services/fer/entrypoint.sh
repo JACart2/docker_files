@@ -12,24 +12,8 @@ echo 'source "/dev_ws/install/setup.bash" ' >> ~/.bashrc
 # take in command line input and execute
 
 if [[ -z "$FER_COMMAND" ]]; then
-  echo "RUNNING FER"
-
-  # this will run the emotiondetection script
-  cd ~/src/FER_DataCollection
-  cd modified_legacy_code
-  python3 EmotionDetection.py
+  exec "$@"
 else
   bash -c "$FER_COMMAND"
 fi
 
-# echo "RUN_FER is set to: $RUN_FER"
-# if [ "$RUN_FER" == "true"  ]; then
-#     echo "RUNNING FER"
-
-#     # this will run the emotiondetection script
-#     cd ~/src/FER_DataCollection
-#     cd modified_legacy_code
-#     python3 EmotionDetection.py
-# else
-#     echo "NOT RUNNING FER"
-# fi

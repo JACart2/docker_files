@@ -38,11 +38,12 @@ services:
     build:
       context: ./services/fer/
       dockerfile: ./Dockerfile
+    command: python3 EmotionDetection.py
     environment:
       - FER_COMMAND
       - ROS_DOMAIN_ID=0
     volumes:
-      - /home/jacart/jacart-project/dev_ws/FER_DataCollection/OA_SECRET.txt:/mnt/OA_SECRET.txt # grabbing OA_secret
+      - /home/jacart/jacart-project/dev_ws/src/FER_DataCollection/OA_SECRET.txt:/mnt/OA_SECRET.txt # grabbing OA_secret
       - /home/jacart/jacart-project/dev_ws:/dev_ws # think about getting specific to the repo
     privileged: true
     runtime: nvidia
