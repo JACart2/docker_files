@@ -125,4 +125,5 @@ RUN pip3 install moviepy==1.0.3 && \
 
 # # initialize entrypoint, this gets access to the secret on the machine
 COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
