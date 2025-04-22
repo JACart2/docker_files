@@ -2,7 +2,6 @@
 export OA_SECRET=$(cat /mnt/OA_SECRET.txt)
 
 echo "OA_SECRET is set to: $OA_SECRET"
-echo "SERIAL_NUMBER is set to: $SERIAL_NUMBER"
 
 # setup ros2 environment
 source "/opt/ros/humble/setup.bash" --

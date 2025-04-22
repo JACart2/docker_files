@@ -9,6 +9,7 @@ services:
     command: ros2 launch cart_launch autonomous_launcher.launch.py #can be overriden with $BACKEND_COMMAND
     environment:
       - BACKEND_COMMAND #will override the default command above
+      - ROS_DOMAIN_ID=0
       - $HOME/.ssh:/root/.ssh
       - $HOME/.gitconfig:/root/.gitconfig
       - DISPLAY
@@ -40,6 +41,7 @@ services:
     environment:
       - FER_COMMAND
       - /home/jacart/jacart-project/dev_ws:/dev_ws # think about getting specific to the repo
+      - ROS_DOMAIN_ID=0
     volumes:
       - /home/jacart/jacart-project/dev_ws/FER_DataCollection/OA_SECRET.txt:/mnt/OA_SECRET.txt # grabbing OA_secret
     privileged: true

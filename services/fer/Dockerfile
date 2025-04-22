@@ -22,8 +22,6 @@ RUN apt-get update && \
 # nvidia-container-runtime & serial_number for cam
 ENV NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES:-all}
 ENV NVIDIA_DRIVER_CAPABILITIES=${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics,compute,video,utility
-# code specific values
-ENV SERIAL_NUMBER=${SERIAL_NUMBER:-31061594}
 
 # setting up the codebase
 WORKDIR /src

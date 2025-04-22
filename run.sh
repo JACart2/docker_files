@@ -1,7 +1,6 @@
 #!/bin/bash
 
 bash ./initialize_host.sh
-RUN_FER="false"
 
 open_browser_when_ready () {
 	until curl -s http://localhost:5173 > /dev/null

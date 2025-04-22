@@ -5,4 +5,5 @@ echo "Cloning repos"
 mkdir -p src
 cd src
 git clone --branch display_global_path https://github.com/JACart2/ai-navigation.git && \
+git clone --branch display_global_path https://github.com/JACart2/FER_DataCollection.git && \
 	echo "Repos have been set up. This workspace will be build by the docker entry script every time it runs."
