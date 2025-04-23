@@ -8,9 +8,7 @@ Dockerfile and scripts for complete setup and operation of a JACart.
 
 # Installation
 
-First clone this repo.
-
-## Required Dependencies
+## 1. Install required dependencies
 
 1. [Install Nvidia Cuda Drivers](https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=22.04&target_type=deb_network)
 1. [Install Docker Engine](https://docs.docker.com/engine/install/ubuntu/)
@@ -18,6 +16,9 @@ First clone this repo.
 1. [Install NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
 
 An attempt was made to write scripts to do this for you (still in the ./require directory). It would be nice if somone could get that working.
+
+## 2. Set up workspace
+Clone docker_files and create a folder named dev_ws in the same directory. Change the working directory to dev_ws and run `../docker_files/initSrc.sh`. This will initialize source files.
 
 # Running
 `bash ./run.sh` will run everything for full operation of the cart including initializing the host. This does the steps below for you. This not praticial for development use.
@@ -36,6 +37,9 @@ An attempt was made to write scripts to do this for you (still in the ./require 
 # Development
 
 `bash ./dev-run.sh` will create the containers but override the entry commands so they don't start anything. You should run this before using any of the options below.
+
+## Basic structure
+Any ROS packages that you want to actively work on should be put in dev_ws. Any ROS packages that are not under development (ie, dependencies) are stored in the backend docker image in the dependency_ws folder. Packages in the dev_ws folder will be build by the backend entry script whenever the container runs.
 
 ## VSCode
 
@@ -60,11 +64,3 @@ Once you open the container in vscode, opening a terminal (through VSCode) will 
 ## Manual Clean Up
 - `docker rm <Container id or name>`  :  Remove specified container
 - `docker rmi <Image id or name>`     :  Remove specified image
-
-## Notes about manual Building
-Manually start the container and connect to a terminal in it using the above commands.
-cd to dev_ws/src
-`colcon build --symlink-install`
-`source install/setup.bash`
-Builds it manually -- it is not always built or sourced due to the nature of docker compose
-Try this if you feel like your edits aren't affecting the docker.
