@@ -1,5 +1,4 @@
 volumes:
-  dev_ws:
   ui:
 
 services:
@@ -13,11 +12,14 @@ services:
       - $HOME/.ssh:/root/.ssh
       - $HOME/.gitconfig:/root/.gitconfig
       - DISPLAY
+      - AMENT_PREFIX_PATH=/opt/ros/humble:/dev_ws/install:/dependency_ws/install
+      - COLCON_PREFIX_PATH=/dev_ws/install
+      - LD_LIBRARY_PATH=/usr/local/lib:/opt/ros/humble/lib:/dev_ws/install/lib:/dependency_ws/install/lib
     volumes:
-      - /tmp/.X11-unix:/tmp/.X11-unix
       - $HOME/.Xauthority:/root/.Xauthority
+      - /home/jacart2/LIO-SAM/dev_ws:/dev_ws
+      - /tmp/.X11-unix:/tmp/.X11-unix
       - /dev:/dev
-      - dev_ws:/dev_ws
     privileged: true
     runtime: nvidia
     network_mode: "host"
