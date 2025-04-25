@@ -69,12 +69,14 @@ RUN wget -O zed-sdk.run https://download.stereolabs.com/zedsdk/4.0/cu117/ubuntu2
 # SETTING UP ROS2
 # Get packages -------------------------------------------------------------------------------------------
 
-  # WORKDIR /dev_ws/src
+# WORKDIR /dev_ws/src
 # RUN git clone --recursive --depth 1 --branch humble-v4.0.8 https://github.com/stereolabs/zed-ros2-wrapper.git && \
 #   git clone https://github.com/stereolabs/zed-ros2-examples.git && \
 #   apt-get update
-WORKDIR /dev_ws/
 
+# make /src
+WORKDIR /dev_ws/src
+WORKDIR /dev_ws
 # Initialize rosdep
 RUN rosdep init && rosdep update
 
