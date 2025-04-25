@@ -5,7 +5,7 @@
       <!-- Disable default transports -->
       <useBuiltinTransports>false</useBuiltinTransports>
 
-      <!-- Define the UDP transport configuration -->
+      <!-- Define UDP transport configuration -->
       <userTransports>
         <transport_id>udp</transport_id>
       </userTransports>
@@ -13,6 +13,7 @@
       <transport>
         <transport_id>udp</transport_id>
         <type>UDPv4</type>
+        <multicast_enabled>false</multicast_enabled>
       </transport>
 
     </rtps>
