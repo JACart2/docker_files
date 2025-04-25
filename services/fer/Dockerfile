@@ -105,7 +105,7 @@ RUN pip3 install fer
 
 # Hack fix because Numpy installation is corrupted. I believe this is because of the zed-sdk installation above, but not 100% sure.
 RUN rm -rf /usr/local/lib/python3.10/dist-packages/numpy*
-RUN pip install numpy --force-reinstall
+RUN pip install numpy==1.26.4 --force-reinstall
 
 RUN pip3 install moviepy==1.0.3 && \
   pip3 install opencv-python && \

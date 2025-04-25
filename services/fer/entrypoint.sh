@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 export OA_SECRET=$(cat /mnt/OA_SECRET.txt)
 
 echo "OA_SECRET is set to: $OA_SECRET"

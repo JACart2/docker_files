@@ -5,7 +5,6 @@ set -e
 source "/opt/ros/humble/setup.bash" --
 source "/dependency_ws/install/setup.bash"
 cd /dev_ws
-rm -rf build log install
 rosdep update
 rosdep install --from-paths /dev_ws/src --ignore-src -r -y 
 colcon build --symlink-install

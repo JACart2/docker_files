@@ -14,11 +14,14 @@ services:
       - $HOME/.gitconfig:/root/.gitconfig
       - DISPLAY
       - XDG_RUNTIME_DIR
+      - RMW_IMPLEMENTATION: rmw_fastrtps_cpp
+      - FASTRTPS_DEFAULT_PROFILES_FILE: /rmw_profile.xml
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
       - $HOME/.Xauthority:/root/.Xauthority
       - /dev:/dev
       - /home/jacart/jacart-project/dev_ws:/dev_ws
+      - ./rmw_profile.xml:/rmw_profile.xml
     privileged: true
     runtime: nvidia
     network_mode: "host"
@@ -42,9 +45,12 @@ services:
     environment:
       - FER_COMMAND
       - ROS_DOMAIN_ID=0
+      - RMW_IMPLEMENTATION: rmw_fastrtps_cpp
+      - FASTRTPS_DEFAULT_PROFILES_FILE: /rmw_profile.xml
     volumes:
       - /home/jacart/jacart-project/dev_ws/src/FER_DataCollection/OA_SECRET.txt:/mnt/OA_SECRET.txt # grabbing OA_secret
       - /home/jacart/jacart-project/dev_ws:/dev_ws # think about getting specific to the repo
+      - ./rmw_profile.xml:/rmw_profile.xml
     privileged: true
     runtime: nvidia
     network_mode: "host"
