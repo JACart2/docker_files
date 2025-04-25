@@ -1,24 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <dds>
-  <!-- Transport Descriptors -->
-  <transport_descriptors>
-    <!-- Use UDP transport -->
-    <transport_descriptor>
-      <transport_id>udp</transport_id>
-      <type>UDPv4</type>
-    </transport_descriptor>
-  </transport_descriptors>
-
-  <!-- Participant Configuration -->
-  <participant>
+  <participant profile_name="default">
     <rtps>
       <!-- Disable default transports (shared memory) -->
       <useBuiltinTransports>false</useBuiltinTransports>
 
-      <!-- Specify user-defined transport (UDP) -->
+      <!-- Enable UDP transport -->
       <userTransports>
         <transport_id>udp</transport_id>
       </userTransports>
+
+      <transport_descriptors>
+        <transport_descriptor>
+          <transport_id>udp</transport_id>
+          <type>UDPv4</type>
+        </transport_descriptor>
+      </transport_descriptors>
     </rtps>
   </participant>
 </dds>
