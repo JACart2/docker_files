@@ -2,10 +2,10 @@
 <dds>
   <participant profile_name="default">
     <rtps>
-      <!-- Disable shared memory transport -->
+      <!-- Disable the default shared memory transport -->
       <useBuiltinTransports>false</useBuiltinTransports>
 
-      <!-- Specify UDP transport -->
+      <!-- Define UDP transport -->
       <transport_descriptors>
         <transport_descriptor>
           <transport_id>udp</transport_id>
