@@ -74,10 +74,6 @@ ENV NVIDIA_VISIBLE_DEVICES \
 ENV NVIDIA_DRIVER_CAPABILITIES \
     ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics,compute,video,utility
 
-# setup entrypoint
-COPY entrypoint.sh /entrypoint.sh
-RUN sudo chmod 755 /entrypoint.sh
-
 # Environment installs
 RUN . /opt/ros/humble/setup.sh \
     && sudo apt-get update \
@@ -88,7 +84,6 @@ RUN . /opt/ros/humble/setup.sh \
 
 # Install and build ros dependencies
 WORKDIR /dependency_ws/src
-RUN git clone https://github.com/rsasaki0109/lidar_localization_ros2.git
 RUN git clone https://github.com/rsasaki0109/ndt_omp_ros2.git
 RUN git clone --recursive --depth 1 --branch humble-v4.0.8 https://github.com/stereolabs/zed-ros2-wrapper.git
 RUN git clone https://github.com/stereolabs/zed-ros2-examples.git
@@ -122,7 +117,8 @@ RUN apt-get update && apt-get install -y \
     libproj-dev \
     libeigen3-dev
 
-# Ensure workspace directory exists
-RUN mkdir -p /dev_ws/src
+# setup entrypoint
+COPY entrypoint.sh /entrypoint.sh
+RUN sudo chmod 755 /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]

@@ -17,7 +17,7 @@ services:
       - LD_LIBRARY_PATH=/usr/local/lib:/opt/ros/humble/lib:/dev_ws/install/lib:/dependency_ws/install/lib
     volumes:
       - $HOME/.Xauthority:/root/.Xauthority
-      - /home/jacart2/LIO-SAM/dev_ws:/dev_ws
+      - ../dev_ws:/dev_ws
       - /tmp/.X11-unix:/tmp/.X11-unix
       - /dev:/dev
     privileged: true
