@@ -1,6 +1,5 @@
 volumes:
   ui:
-
 services:
   backend:
     build:
