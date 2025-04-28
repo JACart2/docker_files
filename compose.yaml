@@ -18,7 +18,7 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix
       - $HOME/.Xauthority:/root/.Xauthority
       - /dev:/dev
-      - /home/jacart/jacart-project/dev_ws:/dev_ws
+      - ../dev_ws:/dev_ws
     privileged: true
     runtime: nvidia
     ipc: "host"
@@ -30,12 +30,12 @@ services:
     command: npm run dev #can be overriden with $FRONTEND_COMMAND
     environment:
       - FRONTEND_COMMAND #will override the default command above
-    network_mode: "host"
-    ipc: "host"
     volumes:
       - $HOME/.ssh:/root/.ssh
       - $HOME/.gitconfig:/root/.gitconfig
       - ui:/ui
+    network_mode: "host"
+    ipc: "host"
   fer:
     build:
       context: ./services/fer/
@@ -47,11 +47,9 @@ services:
       - FER_COMMAND
       - ROS_DOMAIN_ID=0
     volumes:
-      - /home/jacart/jacart-project/dev_ws/src/OA_SECRET.txt:/mnt/OA_SECRET.txt # grabbing OA_secret
-      - /home/jacart/jacart-project/dev_ws:/dev_ws # think about getting specific to the repo
+      - ../dev_ws/src/OA_SECRET.txt:/mnt/OA_SECRET.txt # grabbing OA_secret
+      - ../dev_ws:/dev_ws # think about getting specific to the repo
     privileged: true
     runtime: nvidia
     network_mode: "host"
     ipc: "host"
-    stdin_open: true
-    tty: true
