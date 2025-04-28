@@ -1,6 +1,5 @@
 volumes:
   ui:
-
 services:
   backend:
     build:
@@ -9,6 +8,7 @@ services:
     command: ros2 launch cart_launch autonomous_launcher.launch.py #can be overriden with $BACKEND_COMMAND
     environment:
       - BACKEND_COMMAND #will override the default command above
+      - ROS_DOMAIN_ID=0
       - $HOME/.ssh:/root/.ssh
       - $HOME/.gitconfig:/root/.gitconfig
       - DISPLAY
@@ -17,9 +17,10 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix
       - $HOME/.Xauthority:/root/.Xauthority
       - /dev:/dev
-      - /home/jacart/jacart-project/dev_ws:/dev_ws
+      - ../dev_ws:/dev_ws
     privileged: true
     runtime: nvidia
+    ipc: "host"
     network_mode: "host"
   frontend:
     build:
@@ -28,8 +29,26 @@ services:
     command: npm run dev #can be overriden with $FRONTEND_COMMAND
     environment:
       - FRONTEND_COMMAND #will override the default command above
-    network_mode: "host"
     volumes:
       - $HOME/.ssh:/root/.ssh
       - $HOME/.gitconfig:/root/.gitconfig
       - ui:/ui
+    network_mode: "host"
+    ipc: "host"
+  fer:
+    build:
+      context: ./services/fer/
+      dockerfile: ./Dockerfile
+    depends_on:
+      - backend
+    command: python3 EmotionDetection.py
+    environment:
+      - FER_COMMAND
+      - ROS_DOMAIN_ID=0
+    volumes:
+      - ../dev_ws/src/OA_SECRET.txt:/mnt/OA_SECRET.txt # grabbing OA_secret
+      - ../dev_ws:/dev_ws # think about getting specific to the repo
+    privileged: true
+    runtime: nvidia
+    network_mode: "host"
+    ipc: "host"
