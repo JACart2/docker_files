@@ -87,13 +87,18 @@ RUN . /opt/ros/humble/setup.sh \
     && sudo apt install -y xauth
 
 # Install and build ros dependencies
+
+# Install core MOLA modules and 3D LiDAR odometry and GPS stuff:
+RUN sudo apt install -y \ 
+    ros-humble-mola ros-humble-mola-state-estimation ros-humble-mola-lidar-odometry \
+    ros-humble-mrpt-sensor-gnss-nmea
+ 
+
 WORKDIR /dependency_ws/src
-RUN git clone https://github.com/TixiaoShan/LIO-SAM.git lio_sam
+RUN git clone https://github.com/rsasaki0109/lidar_localization_ros2.git
 RUN git clone https://github.com/rsasaki0109/ndt_omp_ros2.git
 RUN git clone --recursive --depth 1 --branch humble-v4.0.8 https://github.com/stereolabs/zed-ros2-wrapper.git
 RUN git clone https://github.com/stereolabs/zed-ros2-examples.git
-RUN git clone https://github.com/stereolabs/zed-ros2-interfaces.git
-
 
 WORKDIR /dependency_ws
 RUN bash -c "source /opt/ros/humble/setup.bash && \
