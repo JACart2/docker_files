@@ -15,6 +15,7 @@ RUN apt-get install -y neovim tmux git
 WORKDIR /
 RUN git clone https://github.com/JACart2/ui.git
 WORKDIR /ui
+RUN git pull
 RUN npm install
 
 # setup entrypoint

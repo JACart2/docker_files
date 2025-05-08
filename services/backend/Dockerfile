@@ -107,5 +107,5 @@ RUN apt remove brltty
 RUN apt-get install -y neovim
 RUN apt-get install -y tmux
 RUN sudo apt-get install libpcl-dev
-
+RUN sudo apt install ros-humble-image-transport-plugins ros-humble-theora-image-transport ros-humble-compressed-depth-image-transport ros-humble-compressed-image-transport
 ENTRYPOINT ["/entrypoint.sh"]
