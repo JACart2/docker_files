@@ -32,6 +32,7 @@ RUN cp /var/cuda-repo-ubuntu2204-12-5-local/cuda-*-keyring.gpg /usr/share/keyrin
 RUN apt-get update
 RUN apt-get -y install cuda-toolkit-12-5
 RUN apt-get install -y cuda-drivers
+RUN apt-get update && apt-get install -y --no-install-recommends nvidia-cuda-toolkit
 
 # Setup Zed SDK https://www.stereolabs.com/docs/installation/linux ---------------------------------------------------
 RUN wget -O zed-sdk.run https://download.stereolabs.com/zedsdk/4.0/cu117/ubuntu22
