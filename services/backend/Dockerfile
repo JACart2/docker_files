@@ -94,7 +94,7 @@ RUN git clone https://github.com/rsasaki0109/ndt_omp_ros2.git
 RUN git clone --recursive --depth 1 --branch humble-v4.0.8 https://github.com/stereolabs/zed-ros2-wrapper.git
 RUN git clone https://github.com/stereolabs/zed-ros2-examples.git
 RUN git clone https://github.com/stereolabs/zed-ros2-interfaces.git
-
+RUN git clone -b humble https://github.com/ros-perception/pointcloud_to_laserscan.git
 
 WORKDIR /dependency_ws
 RUN bash -c "source /opt/ros/humble/setup.bash && \
