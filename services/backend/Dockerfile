@@ -76,6 +76,7 @@ RUN git clone https://github.com/rsasaki0109/ndt_omp_ros2.git
 RUN git clone --branch display_global_path https://github.com/JACart2/ai-navigation.git
 RUN git clone --recursive --depth 1 --branch humble-v4.0.8 https://github.com/stereolabs/zed-ros2-wrapper.git 
 RUN git clone https://github.com/stereolabs/zed-ros2-examples.git
+RUN git clone --branch ros2 https://github.com/JACart2/LIO-SAM.git
 RUN apt-get update
 RUN apt-get -y install ros-humble-velodyne
 WORKDIR /dev_ws/
