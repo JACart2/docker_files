@@ -95,6 +95,7 @@ RUN git clone --recursive --depth 1 --branch humble-v4.0.8 https://github.com/st
 RUN git clone https://github.com/stereolabs/zed-ros2-examples.git
 RUN git clone https://github.com/stereolabs/zed-ros2-interfaces.git
 RUN git clone -b humble https://github.com/ros-perception/pointcloud_to_laserscan.git
+RUN git clone --branch ros2 https://github.com/JACart2/LIO-SAM.git
 
 WORKDIR /dependency_ws
 RUN bash -c "source /opt/ros/humble/setup.bash && \
