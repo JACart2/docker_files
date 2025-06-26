@@ -28,8 +28,8 @@ services:
     command: npm run dev #can be overriden with $FRONTEND_COMMAND
     environment:
       - FRONTEND_COMMAND #will override the default command above
+      - $HOME/.gitconfig:/root/.gitconfig
     network_mode: "host"
     volumes:
       - $HOME/.ssh:/root/.ssh
-      - $HOME/.gitconfig:/root/.gitconfig
       - ui:/ui
