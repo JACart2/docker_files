@@ -32,4 +32,3 @@ services:
     network_mode: "host"
     volumes:
       - $HOME/.ssh:/root/.ssh
-      - ui:/ui
