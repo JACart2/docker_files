@@ -34,7 +34,7 @@ RUN apt-get -y install cuda-toolkit-12-5
 RUN apt-get install -y cuda-drivers
 
 # Setup Zed SDK https://www.stereolabs.com/docs/installation/linux ---------------------------------------------------
-RUN wget -O zed-sdk.run https://download.stereolabs.com/zedsdk/4.0/cu117/ubuntu22
+RUN wget -O zed-sdk.run https://download.stereolabs.com/zedsdk/4.0/cu125/ubuntu22
 #zed cuda dependency (https://developer.nvidia.com/cuda-downloads)
 RUN apt-get install -y libxml2
 RUN apt-get install -y gcc
@@ -73,8 +73,8 @@ RUN git clone https://github.com/RainerKuemmerle/g2o.git /root/g2o && \
 WORKDIR /dev_ws/src
 RUN git clone https://github.com/rsasaki0109/lidar_localization_ros2.git
 RUN git clone https://github.com/rsasaki0109/ndt_omp_ros2.git
-RUN git clone --branch display_global_path https://github.com/JACart2/ai-navigation.git
-RUN git clone --recursive --depth 1 --branch humble-v4.0.8 https://github.com/stereolabs/zed-ros2-wrapper.git 
+RUN git clone --branch summer2025 https://github.com/JACart2/ai-navigation.git
+RUN git clone --recursive --depth 1 https://github.com/stereolabs/zed-ros2-wrapper.git 
 RUN git clone https://github.com/stereolabs/zed-ros2-examples.git
 RUN git clone --branch ros2 https://github.com/JACart2/LIO-SAM.git
 RUN apt-get update
