@@ -114,6 +114,10 @@ ENV NVIDIA_VISIBLE_DEVICES \
 ENV NVIDIA_DRIVER_CAPABILITIES \
     ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics,compute,video,utility
 
+# Add pcd file from local file to /dev_ws/src/maps in container
+WORKDIR /dev_ws/src/maps
+COPY ./final_map_condensed_5-22.pcd /dev_ws/src/maps
+
 # setup entrypoint
 COPY entrypoint.sh /entrypoint.sh
 RUN sudo chmod 755 /entrypoint.sh
