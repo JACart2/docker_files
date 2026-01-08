@@ -1,5 +1,4 @@
 volumes:
-  dev_ws:
   ui:
 
 services:
@@ -17,9 +16,11 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix
       - $HOME/.Xauthority:/root/.Xauthority
       - /dev:/dev
-      - dev_ws:/dev_ws
+      - type: bind
+        source: /home/spragunr/courses/CS480/dev_ws
+        target: /dev_ws
     privileged: true
-    runtime: nvidia
+    #runtime: nvidia
     network_mode: "host"
   frontend:
     build:
