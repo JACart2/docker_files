@@ -121,6 +121,10 @@ RUN /bin/bash -c "source /opt/ros/jazzy/setup.bash && \
 #     && chmod +x src/ai-navigation/motor_control/resource/docker_startup_script.sh \
 #     && ./src/ai-navigation/motor_control/resource/docker_startup_script.sh
 
+# Get maps
+RUN mkdir -p /maps && \
+    wget -q -r -nd -l1 -A pcd -P /maps https://w3.cs.jmu.edu/spragunr/rosmaps/
+
 # setup entrypoint
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod 755 /entrypoint.sh
