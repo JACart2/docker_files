@@ -17,10 +17,10 @@ services:
       - $HOME/.Xauthority:/root/.Xauthority
       - /dev:/dev
       - type: bind
-        source: /home/spragunr/courses/CS480/dev_ws
+        source: /home/jacart/jacart/dev_ws
         target: /dev_ws
     privileged: true
-    #runtime: nvidia
+    runtime: nvidia
     network_mode: "host"
   frontend:
     build:

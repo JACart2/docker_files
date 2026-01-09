@@ -67,13 +67,13 @@ RUN set -eux; \
     apt-get update; \
     apt-get install -y ros-jazzy-velodyne \
     ros-jazzy-rosbridge-server \
-    python3-pip \
     ros-jazzy-tf-transformations \
     ros-jazzy-pointcloud-to-laserscan \
     python3-transforms3d \
     python3-networkx \
     python3-serial \
     python3-bitstruct \
+    ros-jazzy-swri-console \
     xauth \
     tmux \
     neovim \
