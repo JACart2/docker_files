@@ -8,14 +8,27 @@ Docker setup for running the JACart software stack using **ROS 2 Jazzy** on **Ub
 
 ## Setup
 
+### Part 1: Host Machine Setup (One-time Admin Task)
+*Perform this only once when configuring a fresh machine.*
+
 1.  Clone this repository.
-2.  Run the host bootstrap script to install all dependencies (Docker, NVIDIA Container Toolkit, VS Code, drivers, etc.):
+2.  Run the host bootstrap script to install system dependencies (Docker, NVIDIA drivers, VS Code, etc.):
     ```bash
     ./setup_cart_host_ubuntu24.sh
     ```
-    *Note: A reboot may be required after installing NVIDIA drivers.*
-    This step is only required once per host, not once per account.
-3.  Ensure your user is added to the docker group:
+3.  **Reboot** the machine if NVIDIA drivers were installed or updated.
+
+### Part 2: User Account Setup
+*Perform this for every user account that will use this software.*
+
+1.  Clone this repository (if you haven't already).
+2.  Clone the `ai_navigation` repository into `~/dev_ws`:
+    ```bash
+    mkdir -p ~/dev_ws/src
+    cd ~/dev_ws/src
+    git clone https://github.com/JACart2/ai-navigation.git
+    ```
+3.  Add your user to the docker group to run containers without `sudo`:
     ```bash
     sudo usermod -aG docker $USER
     newgrp docker
@@ -38,7 +51,7 @@ To start the containers in a detached state and attach an interactive terminal t
 ```
 *   **Backend**: Stalled (interactive terminal attached).
 *   **Frontend**: Runs normally (web UI accessible at localhost:5173).
-*   Mounts your local workspace (default: `$HOME/courses/CS480/dev_ws`) to `/dev_ws`.
+*   Mounts your local workspace (default: `$HOME/dev_ws`) to `/dev_ws`.
 *   Terminal starts in `/dev_ws` with all ROS environments sourced.
 
 **Option 2: Full Debugging**
