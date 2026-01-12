@@ -17,7 +17,7 @@ services:
       - $HOME/.Xauthority:/root/.Xauthority
       - /dev:/dev
       - type: bind
-        source: /home/jacart/jacart/dev_ws
+        source: $HOME/dev_ws
         target: /dev_ws
     privileged: true
     runtime: nvidia

@@ -23,4 +23,4 @@ open_browser_when_ready &
 BACKEND_COMMAND="tail -f /dev/null" docker compose up -d --build --remove-orphans --force-recreate
 
 # Attach a terminal to the backend
-docker compose exec -it backend bash -c "source /opt/ros/jazzy/setup.bash; source /opt/ros_ws/install/setup.bash; exec bash"
+docker compose exec -it -w /dev_ws backend bash -c 'source /opt/ros/jazzy/setup.bash && source /opt/ros_ws/install/setup.bash && ([ -f /dev_ws/install/setup.bash ] && source /dev_ws/install/setup.bash); exec bash'
