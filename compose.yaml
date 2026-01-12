@@ -1,5 +1,6 @@
 volumes:
   ui:
+  zed_resources:
 
 services:
   backend:
@@ -16,6 +17,7 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix
       - $HOME/.Xauthority:/root/.Xauthority
       - /dev:/dev
+      - zed_resources:/usr/local/zed/resources
       - type: bind
         source: $HOME/dev_ws
         target: /dev_ws
