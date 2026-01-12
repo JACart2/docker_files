@@ -14,6 +14,12 @@ Docker setup for running the JACart software stack using **ROS 2 Jazzy** on **Ub
     ./setup_cart_host_ubuntu24.sh
     ```
     *Note: A reboot may be required after installing NVIDIA drivers.*
+    This step is only required once per host, not once per account.
+3.  Ensure your user is added to the docker group:
+    ```bash
+    sudo usermod -aG docker $USER
+    newgrp docker
+    ```
 
 ## Usage
 
