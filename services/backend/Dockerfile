@@ -79,6 +79,11 @@ RUN set -eux; \
     neovim \
     emacs 
 
+# Configure tmux
+RUN echo "set -g history-limit 100000" >> /root/.tmux.conf && \
+    echo "set -g mouse on" >> /root/.tmux.conf && \
+    echo "set -g set-clipboard on" >> /root/.tmux.conf
+
 # It seems that the base image includes a pip installed version of numpy
 # that causes all sorts of compatibility issues
 RUN python3 -m pip uninstall --break-system-packages -y numpy

@@ -22,5 +22,19 @@ open_browser_when_ready &
 # We set FRONTEND_COMMAND to empty (or unset) to trigger the default behavior in entrypoint.sh/compose.yaml
 BACKEND_COMMAND="tail -f /dev/null" docker compose up -d --build --remove-orphans --force-recreate
 
+# Launch VS Code attached to the container
+if command -v code &> /dev/null; then
+    CONTAINER_ID=$(docker compose ps -q backend)
+    if [ -n "$CONTAINER_ID" ]; then
+        CONTAINER_NAME=$(docker inspect --format '{{.Name}}' $CONTAINER_ID | sed 's/^\///')
+        if [ -n "$CONTAINER_NAME" ]; then
+             HEX_NAME=$(printf "$CONTAINER_NAME" | od -A n -t x1 | tr -d ' \n')
+             URI="vscode-remote://attached-container+${HEX_NAME}/dev_ws"
+             echo "Opening VS Code attached to ${CONTAINER_NAME}..."
+             code --folder-uri "$URI"
+        fi
+    fi
+fi
+
 # Attach a terminal to the backend
 docker compose exec -it -w /dev_ws backend bash -c 'source /opt/ros/jazzy/setup.bash && source /opt/ros_ws/install/setup.bash && ([ -f /dev_ws/install/setup.bash ] && source /dev_ws/install/setup.bash); exec bash'
