@@ -1,4 +1,4 @@
-FROM stereolabs/zed:5.1-devel-cuda12.8-ubuntu24.04
+FROM stereolabs/zed:5.1-gl-devel-cuda12.8-ubuntu24.04
 
 SHELL ["/bin/bash", "-lc"]
 ARG DEBIAN_FRONTEND=noninteractive
