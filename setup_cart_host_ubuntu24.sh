@@ -122,6 +122,36 @@ sudo udevadm control --reload-rules
 sudo udevadm trigger
 
 # -------------------------
+# Install & Configure Conky
+# -------------------------
+echo "==> Installing Conky (system monitor)"
+sudo apt-get install -y conky-all lm-sensors
+
+# 1. Global config
+# We want this config to apply to all users by default if they don't have a local one.
+# Overwriting /etc/conky/conky.conf establishes this default behavior.
+if [ -f "./configs/conky.conf" ]; then
+    echo "==> Deploying Conky configuration to /etc/conky/conky.conf"
+    sudo cp ./configs/conky.conf /etc/conky/conky.conf
+else
+    echo "WARNING: ./configs/conky.conf not found. Skipping config deployment."
+fi
+
+# 2. Autostart for all users
+# Create a .desktop file in /etc/xdg/autostart
+echo "==> Configuring Conky autostart for all users"
+sudo tee /etc/xdg/autostart/conky.desktop > /dev/null <<EOF
+[Desktop Entry]
+Type=Application
+Name=Conky
+Comment=System Monitor
+Exec=conky --daemonize --pause=5
+StartupNotify=false
+Terminal=false
+Hidden=false
+EOF
+
+# -------------------------
 # Quick verification hints
 # -------------------------
 echo
