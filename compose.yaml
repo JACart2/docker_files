@@ -1,6 +1,6 @@
 volumes:
-  dev_ws:
   ui:
+  zed_resources:
 
 services:
   backend:
@@ -17,7 +17,10 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix
       - $HOME/.Xauthority:/root/.Xauthority
       - /dev:/dev
-      - dev_ws:/dev_ws
+      - zed_resources:/usr/local/zed/resources
+      - type: bind
+        source: $HOME/dev_ws
+        target: /dev_ws
     privileged: true
     runtime: nvidia
     network_mode: "host"
