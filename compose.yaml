@@ -1,5 +1,7 @@
 volumes:
   ui:
+  zed_resources:
+
 services:
   backend:
     build:
@@ -17,7 +19,10 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix
       - $HOME/.Xauthority:/root/.Xauthority
       - /dev:/dev
-      - ../dev_ws:/dev_ws
+      - zed_resources:/usr/local/zed/resources
+      - type: bind
+        source: $HOME/dev_ws
+        target: /dev_ws
     privileged: true
     runtime: nvidia
     ipc: "host"
@@ -29,11 +34,11 @@ services:
     command: npm run dev #can be overriden with $FRONTEND_COMMAND
     environment:
       - FRONTEND_COMMAND #will override the default command above
+      - $HOME/.gitconfig:/root/.gitconfig
+    network_mode: "host"
     volumes:
       - $HOME/.ssh:/root/.ssh
-      - $HOME/.gitconfig:/root/.gitconfig
       - ui:/ui
-    network_mode: "host"
     ipc: "host"
   fer:
     build:
