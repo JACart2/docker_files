@@ -134,30 +134,4 @@ RUN mkdir -p /maps && \
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod 755 /entrypoint.sh
 
-# Environment installs
-RUN . /opt/ros/humble/setup.sh \
-    && sudo apt-get update \
-    && sudo apt-get install -y python3-pip \
-    && pip3 install 'transforms3d==0.4.1' \
-    && sudo apt-get install -y ros-humble-tf-transformations \
-    && sudo apt install -y xauth
-
-# Install and build ros dependencies
-WORKDIR /dependency_ws/src
-RUN git clone https://github.com/rsasaki0109/lidar_localization_ros2.git
-RUN git clone https://github.com/rsasaki0109/ndt_omp_ros2.git
-RUN git clone --recursive --depth 1 --branch humble-v4.0.8 https://github.com/stereolabs/zed-ros2-wrapper.git
-RUN git clone https://github.com/stereolabs/zed-ros2-examples.git
-RUN git clone https://github.com/stereolabs/zed-ros2-interfaces.git
-RUN git clone -b humble https://github.com/ros-perception/pointcloud_to_laserscan.git
-RUN git clone --branch ros2 https://github.com/JACart2/LIO-SAM.git
-
-WORKDIR /dependency_ws
-RUN bash -c "source /opt/ros/humble/setup.bash && \
-	     rosdep init && rosdep update && rosdep install --from-paths /dependency_ws/src --ignore-src -r -y && \
-	     colcon build --symlink-install"
-
-# brltty is a package that conflicts with the driver that arudino uses for its usb connection
-RUN apt remove brltty
-
 ENTRYPOINT ["/entrypoint.sh"]
