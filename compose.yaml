@@ -25,7 +25,6 @@ services:
         target: /dev_ws
     privileged: true
     runtime: nvidia
-    ipc: "host"
     network_mode: "host"
   frontend:
     build:
