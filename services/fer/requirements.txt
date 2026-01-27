@@ -1,0 +1,9 @@
+fer
+moviepy==1.0.3
+opencv-python
+tensorflow
+ffmpeg
+argon2-cffi
+python-dotenv
+openai
+transforms3d==0.4.1

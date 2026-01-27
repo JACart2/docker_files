@@ -1,88 +1,133 @@
 # Use the specified base image
-FROM stereolabs/zed:4.2-runtime-cuda12.1-ubuntu22.04
+FROM stereolabs/zed:5.1-gl-devel-cuda12.8-ubuntu24.04
 
 # Set environment variables to ensure correct behavior for installation and system setup
 ENV DEBIAN_FRONTEND=noninteractive
 
+# Choose: ros-jazzy-ros-base (headless) or ros-jazzy-desktop (RViz etc.)
+ARG ROS_META_PKG=ros-jazzy-desktop
 
-# Update package lists and install dependencies
-RUN apt-get update && \
-  apt-get install -y python3-pip && \
-  apt-get install -y python3-dev && \
-  apt-get install -y python3-setuptools && \
-  apt-get install -y python3-tk && \
-  apt-get install -y build-essential && \
-  apt-get install -y cmake && \
-  apt-get install -y git && \
-  apt-get install -y cmake && \
-  apt-get install -y libgl1-mesa-glx && \
-  apt install -y libglib2.0-0 && \
-  rm -rf /var/lib/apt/lists/* 
+# Pin the ZED ROS2 wrapper to match ZED SDK 5.1
+# (Tags are in the repo; master expects SDK v5.1.) 
+ARG ZED_ROS2_WRAPPER_TAG=humble-v5.1.0
+ARG ROS_WS=/opt/ros_ws
 
 # nvidia-container-runtime & serial_number for cam
 ENV NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES:-all}
 ENV NVIDIA_DRIVER_CAPABILITIES=${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics,compute,video,utility
 
-# ROS2 https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html -------------------------------------------------------
-
-RUN apt update
-# Set and Check Locale
-RUN apt-get install --no-install-recommends -y locales && \
-    locale-gen en_US en_US.UTF-8 && \
-    update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 && \
-    export LANG=en_US.UTF-8 && \
-    locale
-
-# Setup Sources
-RUN apt-get install --no-install-recommends -y software-properties-common && \
-	add-apt-repository universe && \
-	apt-get install -y curl && \
-	curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg && \
-	echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | tee /etc/apt/sources.list.d/ros2.list > /dev/null 
-# Install ROS 2 Base packages and Python dependencies
-RUN apt-get update && apt-get install --no-install-recommends -y \
-	ros-humble-desktop \
-	ros-dev-tools
-
-# Install rosbridge so ui can communicate with ros
-RUN apt-get install -y ros-humble-rosbridge-server
+## TODO verify below is not needed
 
 # NVIDIA install
-RUN wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-ubuntu2204.pin && \
-  mv cuda-ubuntu2204.pin /etc/apt/preferences.d/cuda-repository-pin-600 && \
-  wget https://developer.download.nvidia.com/compute/cuda/12.5.0/local_installers/cuda-repo-ubuntu2204-12-5-local_12.5.0-555.42.02-1_amd64.deb && \
-  dpkg -i cuda-repo-ubuntu2204-12-5-local_12.5.0-555.42.02-1_amd64.deb && \ 
-  cp /var/cuda-repo-ubuntu2204-12-5-local/cuda-*-keyring.gpg /usr/share/keyrings/ && \
-  apt-get update && \
-  apt-get -y install cuda-toolkit-12-5 && \
-  apt-get install -y cuda-drivers
+# NO LONGER NEEDED, comes in base image and/or host.
+# RUN wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-ubuntu2204.pin && \
+#   mv cuda-ubuntu2204.pin /etc/apt/preferences.d/cuda-repository-pin-600 && \
+#   wget https://developer.download.nvidia.com/compute/cuda/12.5.0/local_installers/cuda-repo-ubuntu2204-12-5-local_12.5.0-555.42.02-1_amd64.deb && \
+#   dpkg -i cuda-repo-ubuntu2204-12-5-local_12.5.0-555.42.02-1_amd64.deb && \ 
+#   cp /var/cuda-repo-ubuntu2204-12-5-local/cuda-*-keyring.gpg /usr/share/keyrings/ && \
+#   apt-get update && \
+#   apt-get -y install cuda-toolkit-12-5 && \
+#   apt-get install -y cuda-drivers
 
 
-# Setup Zed SDK https://www.stereolabs.com/docs/installation/linux ---------------------------------------------------
-#zed cuda dependency (https://developer.nvidia.com/cuda-downloads)
-RUN wget -O zed-sdk.run https://download.stereolabs.com/zedsdk/4.0/cu117/ubuntu22 && \
-  apt-get install -y libxml2 && \
-  apt-get install -y gcc && \
-  apt-get install -y zstd && \
-  sh zed-sdk.run -- silent skip_tools skip_cuda 
+# # Setup Zed SDK https://www.stereolabs.com/docs/installation/linux ---------------------------------------------------
+# #zed cuda dependency (https://developer.nvidia.com/cuda-downloads)
+# RUN wget -O zed-sdk.run https://download.stereolabs.com/zedsdk/4.0/cu117/ubuntu22 && \
+#   apt-get install -y libxml2 && \
+#   apt-get install -y gcc && \
+#   apt-get install -y zstd && \
+#   sh zed-sdk.run -- silent skip_tools skip_cuda \
+
+
 
 # SETTING UP ROS2
 # Get packages -------------------------------------------------------------------------------------------
 
-# WORKDIR /dev_ws/src
-# RUN git clone --recursive --depth 1 --branch humble-v4.0.8 https://github.com/stereolabs/zed-ros2-wrapper.git && \
-#   git clone https://github.com/stereolabs/zed-ros2-examples.git && \
-#   apt-get update
+# ---------------------------
+# 1) Locale (per ROS docs for minimal envs like Docker)
+# ---------------------------
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends locales; \
+    locale-gen en_US en_US.UTF-8; \
+    update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8; \
+    rm -rf /var/lib/apt/lists/*
+ENV LANG=en_US.UTF-8
+ENV LC_ALL=en_US.UTF-8
+
+# ---------------------------
+# 2) Enable universe + install ros2-apt-source 
+# ---------------------------
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends software-properties-common curl ca-certificates gnupg lsb-release; \
+    add-apt-repository universe; \
+    \
+    apt-get update; \
+    apt-get install -y --no-install-recommends curl; \
+    export ROS_APT_SOURCE_VERSION="$(curl -s https://api.github.com/repos/ros-infrastructure/ros-apt-source/releases/latest | grep -F "tag_name" | awk -F\" '{print $4}')"; \
+    curl -L -o /tmp/ros2-apt-source.deb \
+      "https://github.com/ros-infrastructure/ros-apt-source/releases/download/${ROS_APT_SOURCE_VERSION}/ros2-apt-source_${ROS_APT_SOURCE_VERSION}.$(. /etc/os-release && echo ${UBUNTU_CODENAME:-${VERSION_CODENAME}})_all.deb"; \
+    dpkg -i /tmp/ros2-apt-source.deb; \
+    rm -f /tmp/ros2-apt-source.deb; \
+    rm -rf /var/lib/apt/lists/*
+
+# ---------------------------
+# 3) Install ROS 2 Jazzy + dev tools
+# ---------------------------
+RUN set -eux; \
+    apt-get update; \
+    apt-get upgrade -y; \
+    apt-get install -y --no-install-recommends \
+      ${ROS_META_PKG} \
+      ros-dev-tools \
+      python3-rosdep \
+      python3-colcon-common-extensions \
+      python3-vcstool \
+      build-essential \
+      git; \
+    rm -rf /var/lib/apt/lists/*
+
+# MISC OTHER PACKAGES----------------------------------------------------------------------------------------
+
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+        python3-pip python3-dev python3-setuptools python3-tk \
+        build-essential cmake git \
+        libgl1-mesa-glx libglib2.0-0 \
+        ros-jazzy-velodyne \
+        ros-jazzy-rosbridge-server \
+        ros-jazzy-tf-transformations \
+        ros-jazzy-pointcloud-to-laserscan \
+        ros-jazzy-swri-console \
+        python3-transforms3d \
+        python3-networkx \
+        python3-serial \
+        python3-bitstruct \
+        xauth \
+        tmux \
+        neovim \
+        emacs; \
+    rm -rf /var/lib/apt/lists/*
+        
+
+# Configure tmux
+RUN echo "set -g history-limit 100000" >> /root/.tmux.conf && \
+    echo "set -g mouse on" >> /root/.tmux.conf && \
+    echo "set -g set-clipboard on" >> /root/.tmux.conf
+
+
+# PREPPING DEV WORKSPACE----------------------------------------------------------------------------------------
 
 # make /src
-WORKDIR /dev_ws/src
 WORKDIR /dev_ws
-# Initialize rosdep
-RUN rosdep init && rosdep update
 
+# Initialize rosdep
+RUN rosdep init || true && rosdep update
 
 # build
-RUN /bin/bash -c "source /opt/ros/humble/setup.bash && \
+RUN /bin/bash -c "source /opt/ros/jazzy/setup.bash && \
   apt-get update -y || true && \
   rosdep install --from-paths src --ignore-src -r -y && \
   colcon build --parallel-workers $(nproc) --symlink-install \
@@ -91,35 +136,20 @@ RUN /bin/bash -c "source /opt/ros/humble/setup.bash && \
   ' -DCMAKE_LIBRARY_PATH=/usr/local/cuda/lib64/stubs' \
   ' -DCMAKE_CXX_FLAGS="-Wl,--allow-shlib-undefined"' "
 
-RUN . /opt/ros/humble/setup.sh \
-  && apt-get update \
-  && pip3 install 'transforms3d==0.4.1' \
-  && apt-get install -y ros-humble-tf-transformations \
-  && apt install -y xauth \
-  && apt-get -y install tmux 
-
+# RUN . /opt/ros/jazzy/setup.sh 
 
 # avoiding corruption with these after ros2 
-# Install the FER package (using pip)
-RUN pip3 install fer 
+## angry numpy version from base image, compat issues
+RUN pip3 install --force-reinstall --no-cache-dir numpy==1.26.4
 
-# Hack fix because Numpy installation is corrupted. I believe this is because of the zed-sdk installation above, but not 100% sure.
-RUN rm -rf /usr/local/lib/python3.10/dist-packages/numpy*
-RUN pip install numpy==1.26.4 --force-reinstall
+## installing python packages from requirements.txt
+COPY requirements.txt /tmp/requirements.txt
+RUN pip3 install --no-cache-dir -r /tmp/requirements.txt
 
-RUN pip3 install moviepy==1.0.3 && \
-  pip3 install opencv-python && \
-  pip3 install tensorflow && \
-  pip3 install ffmpeg && \
-  pip3 install argon2-cffi && \ 
-  pip3 install python-dotenv && \
-  pip3 install openai && \
-  pip3 install mysql-connector-python
-
-
-WORKDIR /dev_ws/src/FER_DataCollection/modified_legacy_code
+WORKDIR /dev_ws/src/FER_DataCollection/active_scripts
 
 # # initialize entrypoint, this gets access to the secret on the machine
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
+
 ENTRYPOINT ["/entrypoint.sh"]
