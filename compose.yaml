@@ -47,7 +47,7 @@ services:
       - backend
     command: python3 manager.py
     environment:
-      - ANOMALY_DETECTION_COMMAND
+      - ANOMALY_DETECTION_COMMAND # allows for default command override from entrypoint.sh
       - ROS_DOMAIN_ID=0
     volumes:
       - type: bind

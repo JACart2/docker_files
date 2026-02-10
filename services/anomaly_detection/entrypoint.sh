@@ -7,10 +7,10 @@ echo "OA_SECRET loaded (length: ${#OA_SECRET})"
 source "/opt/ros/jazzy/setup.bash" 
 source "/dev_ws/install/setup.bash" 
 
-# if no FER_COMMAND, default to compose.yml CMD. Otherwise, use FER_COMMAND
-if [[ -z "$FER_COMMAND" ]]; then
+# if no ANOMALY_DETECTION_COMMAND, default to compose.yml CMD. Otherwise, use ANOMALY_DETECTION_COMMAND
+if [[ -z "$ANOMALY_DETECTION_COMMAND" ]]; then
   exec "$@"
 else
-  exec bash -lc "$FER_COMMAND"
+  exec bash -lc "$ANOMALY_DETECTION_COMMAND"
 fi
 

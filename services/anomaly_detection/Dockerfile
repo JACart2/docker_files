@@ -146,7 +146,8 @@ RUN pip3 install --force-reinstall --no-cache-dir numpy==1.26.4
 COPY requirements.txt /tmp/requirements.txt
 RUN pip3 install --no-cache-dir -r /tmp/requirements.txt
 
-WORKDIR /dev_ws/src/FER_DataCollection/active_scripts
+## this should be the root of wherever manager.py will exist
+WORKDIR /dev_ws/src/anomaly_detection
 
 # # initialize entrypoint, this gets access to the secret on the machine
 COPY entrypoint.sh /entrypoint.sh

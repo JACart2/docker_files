@@ -4,11 +4,11 @@ bash ./initialize_host.sh
 
 STALL="tail -f /dev/null"
 
-FRONTEND_COMMAND=$STALL BACKEND_COMMAND=$STALL FER_COMMAND=$STALL docker compose up --build --remove-orphans --force-recreate -d
+FRONTEND_COMMAND=$STALL BACKEND_COMMAND=$STALL ANOMALY_DETECTION_COMMAND=$STALL docker compose up --build --remove-orphans --force-recreate -d
 
 # Launch VS Code attached to the container
 if command -v code &> /dev/null; then
-    CONTAINER_ID=$(docker compose ps -q fer)
+    CONTAINER_ID=$(docker compose ps -q anomaly_detection)
     if [ -n "$CONTAINER_ID" ]; then
         CONTAINER_NAME=$(docker inspect --format '{{.Name}}' $CONTAINER_ID | sed 's/^\///')
         if [ -n "$CONTAINER_NAME" ]; then
@@ -20,7 +20,7 @@ if command -v code &> /dev/null; then
     fi
 fi
 
-# Attach a terminal to the backend
-docker compose exec -it -w /dev_ws fer bash -c 'source /opt/ros/jazzy/setup.bash && source /opt/ros_ws/install/setup.bash && ([ -f /dev_ws/install/setup.bash ] && source /dev_ws/install/setup.bash); exec bash'
+# Attach a terminal to the anomaly_detection
+docker compose exec -it -w /dev_ws anomaly_detection bash -c 'source /opt/ros/jazzy/setup.bash && source /opt/ros_ws/install/setup.bash && ([ -f /dev_ws/install/setup.bash ] && source /dev_ws/install/setup.bash); exec bash'
 
 
