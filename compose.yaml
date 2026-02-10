@@ -39,19 +39,23 @@ services:
       - $HOME/.ssh:/root/.ssh
       - ui:/ui
     ipc: "host"
-  fer:
+  anomaly_detection:
     build:
-      context: ./services/fer/
+      context: ./services/anomaly_detection/
       dockerfile: ./Dockerfile
     depends_on:
       - backend
-    command: python3 EmotionDetection.py
+    command: python3 manager.py
     environment:
-      - FER_COMMAND
+      - ANOMALY_DETECTION_COMMAND
       - ROS_DOMAIN_ID=0
     volumes:
-      - $HOME/dev_ws/src/OA_SECRET.txt:/mnt/OA_SECRET.txt # grabbing OA_secret
-      - $HOME/dev_ws:/dev_ws # think about getting specific to the repo
+      - type: bind
+        source: $HOME/dev_ws/src/OA_SECRET.txt
+        target: /mnt/OA_SECRET.txt
+      - type: bind
+        source: $HOME/dev_ws
+        target: /dev_ws
     privileged: true
     runtime: nvidia
     network_mode: "host"
