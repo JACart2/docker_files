@@ -1,6 +1,9 @@
 # Use the specified base image
 FROM stereolabs/zed:5.1-gl-devel-cuda12.8-ubuntu24.04
 
+# needed for ros setup script on build
+SHELL ["/bin/bash", "-lc"]
+
 # Set environment variables to ensure correct behavior for installation and system setup
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -120,8 +123,11 @@ RUN echo "set -g history-limit 100000" >> /root/.tmux.conf && \
 
 # PREPPING DEV WORKSPACE----------------------------------------------------------------------------------------
 
+# message type
+COPY ./shared_ros_msgs/src/anomaly_msg/ ${ROS_WS}/src/anomaly_msg/
+
 # make /src
-WORKDIR /dev_ws
+WORKDIR ${ROS_WS}
 
 # Initialize rosdep
 RUN rosdep init || true && rosdep update

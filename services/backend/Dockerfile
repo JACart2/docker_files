@@ -90,6 +90,8 @@ RUN python3 -m pip uninstall --break-system-packages -y numpy
 
 # Get packages -------------------------------------------------------------------------------------------
 WORKDIR ${ROS_WS}/src
+# message type
+COPY ./shared_ros_msgs/src/anomaly_msg/ ${ROS_WS}/src/anomaly_msg/
 RUN git clone https://github.com/rsasaki0109/lidar_localization_ros2.git
 RUN git clone https://github.com/rsasaki0109/ndt_omp_ros2.git
 #RUN git clone --branch display_global_path https://github.com/JACart2/ai-navigation.git
