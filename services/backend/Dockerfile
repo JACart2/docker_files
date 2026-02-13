@@ -45,6 +45,17 @@ RUN set -eux; \
     rm -rf /var/lib/apt/lists/*
 
 # ---------------------------
+# Install GitHub CLI (gh)
+# ---------------------------
+RUN set -eux; \
+    mkdir -p /etc/apt/keyrings; \
+    curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null; \
+    chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg; \
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null; \
+    apt-get update; \
+    apt-get install -y gh
+
+# ---------------------------
 # 3) Install ROS 2 Jazzy + dev tools
 # ---------------------------
 RUN set -eux; \
@@ -131,6 +142,10 @@ RUN /bin/bash -c "source /opt/ros/jazzy/setup.bash && \
 # Get maps
 RUN mkdir -p /maps && \
     wget -q -r -nd -l1 -A pcd -P /maps https://w3.cs.jmu.edu/spragunr/rosmaps/
+
+# Get student auth setup script
+RUN wget -O /root/student_auth_setup.sh https://raw.githubusercontent.com/JACart2/docker_files/main/student_auth_setup.sh && \
+    chmod +x /root/student_auth_setup.sh
 
 # setup entrypoint
 COPY entrypoint.sh /entrypoint.sh
