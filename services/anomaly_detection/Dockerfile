@@ -129,7 +129,7 @@ RUN . /opt/ros/jazzy/setup.sh
 RUN pip3 install --force-reinstall --break-system-packages --no-cache-dir numpy==1.26.4
 
 ## installing python packages from requirements.txt
-COPY requirements.txt /tmp/requirements.txt
+COPY ./anomaly_detection/requirements.txt /tmp/requirements.txt
 RUN pip3 install --no-cache-dir --break-system-packages -r /tmp/requirements.txt
 
 ## this should be the root of wherever manager.py will exist
