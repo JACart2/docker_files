@@ -14,33 +14,11 @@ ARG ROS_META_PKG=ros-jazzy-desktop
 # (Tags are in the repo; master expects SDK v5.1.) 
 ARG ZED_ROS2_WRAPPER_TAG=humble-v5.1.0
 ARG ROS_WS=/opt/ros_ws
+ARG SHARED_ROS_RESOURCES=./shared_ros_resources
 
 # nvidia-container-runtime & serial_number for cam
 ENV NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES:-all}
 ENV NVIDIA_DRIVER_CAPABILITIES=${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics,compute,video,utility
-
-## TODO verify below is not needed
-
-# NVIDIA install
-# NO LONGER NEEDED, comes in base image and/or host.
-# RUN wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-ubuntu2204.pin && \
-#   mv cuda-ubuntu2204.pin /etc/apt/preferences.d/cuda-repository-pin-600 && \
-#   wget https://developer.download.nvidia.com/compute/cuda/12.5.0/local_installers/cuda-repo-ubuntu2204-12-5-local_12.5.0-555.42.02-1_amd64.deb && \
-#   dpkg -i cuda-repo-ubuntu2204-12-5-local_12.5.0-555.42.02-1_amd64.deb && \ 
-#   cp /var/cuda-repo-ubuntu2204-12-5-local/cuda-*-keyring.gpg /usr/share/keyrings/ && \
-#   apt-get update && \
-#   apt-get -y install cuda-toolkit-12-5 && \
-#   apt-get install -y cuda-drivers
-
-
-# # Setup Zed SDK https://www.stereolabs.com/docs/installation/linux ---------------------------------------------------
-# #zed cuda dependency (https://developer.nvidia.com/cuda-downloads)
-# RUN wget -O zed-sdk.run https://download.stereolabs.com/zedsdk/4.0/cu117/ubuntu22 && \
-#   apt-get install -y libxml2 && \
-#   apt-get install -y gcc && \
-#   apt-get install -y zstd && \
-#   sh zed-sdk.run -- silent skip_tools skip_cuda \
-
 
 
 # SETTING UP ROS2
@@ -98,7 +76,7 @@ RUN set -eux; \
     apt-get install -y --no-install-recommends \
         python3-pip python3-dev python3-setuptools python3-tk \
         build-essential cmake git \
-        libgl1-mesa-glx libglib2.0-0 \
+        libgl1 libglib2.0-0 \
         ros-jazzy-velodyne \
         ros-jazzy-rosbridge-server \
         ros-jazzy-tf-transformations \
@@ -122,9 +100,10 @@ RUN echo "set -g history-limit 100000" >> /root/.tmux.conf && \
 
 
 # PREPPING DEV WORKSPACE----------------------------------------------------------------------------------------
+    
 
 # message type
-COPY ./shared_ros_msgs/src/anomaly_msg/ ${ROS_WS}/src/anomaly_msg/
+COPY ${SHARED_ROS_RESOURCES}/anomaly_msg/ ${ROS_WS}/src/anomaly_msg/
 
 # make /src
 WORKDIR ${ROS_WS}
@@ -134,7 +113,7 @@ RUN rosdep init || true && rosdep update
 
 # build
 RUN /bin/bash -c "source /opt/ros/jazzy/setup.bash && \
-  apt-get update -y || true && \
+  apt-get update -y || true  && apt-get install -y ros-jazzy-rclpy || true && \
   rosdep install --from-paths src --ignore-src -r -y && \
   colcon build --parallel-workers $(nproc) --symlink-install \
   --event-handlers console_direct+ --base-paths src \
@@ -142,21 +121,22 @@ RUN /bin/bash -c "source /opt/ros/jazzy/setup.bash && \
   ' -DCMAKE_LIBRARY_PATH=/usr/local/cuda/lib64/stubs' \
   ' -DCMAKE_CXX_FLAGS="-Wl,--allow-shlib-undefined"' "
 
-# RUN . /opt/ros/jazzy/setup.sh 
+WORKDIR ~
+RUN . /opt/ros/jazzy/setup.sh 
 
 # avoiding corruption with these after ros2 
 ## angry numpy version from base image, compat issues
-RUN pip3 install --force-reinstall --no-cache-dir numpy==1.26.4
+RUN pip3 install --force-reinstall --break-system-packages --no-cache-dir numpy==1.26.4
 
 ## installing python packages from requirements.txt
 COPY requirements.txt /tmp/requirements.txt
-RUN pip3 install --no-cache-dir -r /tmp/requirements.txt
+RUN pip3 install --no-cache-dir --break-system-packages -r /tmp/requirements.txt
 
 ## this should be the root of wherever manager.py will exist
 WORKDIR /dev_ws/src/anomaly_detection
 
 # # initialize entrypoint, this gets access to the secret on the machine
-COPY entrypoint.sh /entrypoint.sh
+COPY ./anomaly_detection/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]

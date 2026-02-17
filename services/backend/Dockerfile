@@ -12,6 +12,8 @@ ARG ROS_META_PKG=ros-jazzy-desktop
 # (Tags are in the repo; master expects SDK v5.1.) 
 ARG ZED_ROS2_WRAPPER_TAG=humble-v5.1.0
 ARG ROS_WS=/opt/ros_ws
+ARG SHARED_ROS_RESOURCES=./shared_ros_resources
+
 
 # INSTALL ROS----------------------------------------------------------------------------------------
 
@@ -102,7 +104,7 @@ RUN python3 -m pip uninstall --break-system-packages -y numpy
 # Get packages -------------------------------------------------------------------------------------------
 WORKDIR ${ROS_WS}/src
 # message type
-COPY ./shared_ros_msgs/src/anomaly_msg/ ${ROS_WS}/src/anomaly_msg/
+COPY ${SHARED_ROS_RESOURCES}/anomaly_msg ${ROS_WS}/src/anomaly_msg/
 RUN git clone https://github.com/rsasaki0109/lidar_localization_ros2.git
 RUN git clone https://github.com/rsasaki0109/ndt_omp_ros2.git
 #RUN git clone --branch display_global_path https://github.com/JACart2/ai-navigation.git
@@ -148,7 +150,7 @@ RUN wget -O /root/student_auth_setup.sh https://raw.githubusercontent.com/JACart
     chmod +x /root/student_auth_setup.sh
 
 # setup entrypoint
-COPY entrypoint.sh /entrypoint.sh
+COPY ./backend/entrypoint.sh /entrypoint.sh
 RUN chmod 755 /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]

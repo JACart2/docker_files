@@ -20,7 +20,8 @@ open_browser_when_ready &
 
 # Start the frontend with its default command, and stall the backend.
 # We set FRONTEND_COMMAND to empty (or unset) to trigger the default behavior in entrypoint.sh/compose.yaml
-BACKEND_COMMAND="tail -f /dev/null" docker compose up frontend backend -d --build --remove-orphans --force-recreate
+BACKEND_COMMAND="tail -f /dev/null" 
+docker compose up frontend backend -d --build --remove-orphans --force-recreate
 
 # Launch VS Code attached to the container
 if command -v code &> /dev/null; then
