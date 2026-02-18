@@ -38,7 +38,6 @@ services:
     volumes:
       - $HOME/.ssh:/root/.ssh
       - ui:/ui
-    ipc: "host"
   anomaly_detection:
     build:
       context: ./services
