@@ -1,6 +1,7 @@
 ## active
 pyyaml
 openai
+pydantic
 ## not sure if these will be needed, check with devs 
 # fer
 # moviepy==1.0.3
