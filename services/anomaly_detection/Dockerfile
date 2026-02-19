@@ -100,24 +100,6 @@ RUN echo "set -g history-limit 100000" >> /root/.tmux.conf && \
 
 # PREPPING DEV WORKSPACE----------------------------------------------------------------------------------------
 
-## not entirely sure if this is needed without packages, going to leave for now since this probably creates
-## some auto-gen folders
-
-# Initialize rosdep
-RUN rosdep init || true && rosdep update
-
-# build
-RUN /bin/bash -c "source /opt/ros/jazzy/setup.bash && \
-  apt-get update -y || true  && apt-get install -y ros-jazzy-rclpy || true && \
-  rosdep install --from-paths src --ignore-src -r -y && \
-  colcon build --parallel-workers $(nproc) --symlink-install \
-  --event-handlers console_direct+ --base-paths src \
-  --cmake-args ' -DCMAKE_BUILD_TYPE=Release' \
-  ' -DCMAKE_LIBRARY_PATH=/usr/local/cuda/lib64/stubs' \
-  ' -DCMAKE_CXX_FLAGS="-Wl,--allow-shlib-undefined"' "
-
-WORKDIR ~
-RUN . /opt/ros/jazzy/setup.sh 
 
 # avoiding corruption with these after ros2 
 ## angry numpy version from base image, compat issues
