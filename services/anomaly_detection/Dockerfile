@@ -14,7 +14,6 @@ ARG ROS_META_PKG=ros-jazzy-desktop
 # (Tags are in the repo; master expects SDK v5.1.) 
 ARG ZED_ROS2_WRAPPER_TAG=humble-v5.1.0
 ARG ROS_WS=/opt/ros_ws
-ARG SHARED_ROS_RESOURCES=./shared_ros_resources
 
 # nvidia-container-runtime & serial_number for cam
 ENV NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES:-all}
@@ -100,13 +99,9 @@ RUN echo "set -g history-limit 100000" >> /root/.tmux.conf && \
 
 
 # PREPPING DEV WORKSPACE----------------------------------------------------------------------------------------
-    
 
-# message type
-COPY ${SHARED_ROS_RESOURCES}/anomaly_msg/ ${ROS_WS}/src/anomaly_msg/
-
-# make /src
-WORKDIR ${ROS_WS}
+## not entirely sure if this is needed without packages, going to leave for now since this probably creates
+## some auto-gen folders
 
 # Initialize rosdep
 RUN rosdep init || true && rosdep update
@@ -129,14 +124,14 @@ RUN . /opt/ros/jazzy/setup.sh
 RUN pip3 install --force-reinstall --break-system-packages --no-cache-dir numpy==1.26.4
 
 ## installing python packages from requirements.txt
-COPY ./anomaly_detection/requirements.txt /tmp/requirements.txt
+COPY ./requirements.txt /tmp/requirements.txt
 RUN pip3 install --no-cache-dir --break-system-packages -r /tmp/requirements.txt
 
 ## this should be the root of wherever manager.py will exist
 WORKDIR /dev_ws/src/anomaly_detection
 
 # # initialize entrypoint, this gets access to the secret on the machine
-COPY ./anomaly_detection/entrypoint.sh /entrypoint.sh
+COPY ./entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]

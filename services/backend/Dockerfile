@@ -12,7 +12,6 @@ ARG ROS_META_PKG=ros-jazzy-desktop
 # (Tags are in the repo; master expects SDK v5.1.) 
 ARG ZED_ROS2_WRAPPER_TAG=humble-v5.1.0
 ARG ROS_WS=/opt/ros_ws
-ARG SHARED_ROS_RESOURCES=./shared_ros_resources
 
 
 # INSTALL ROS----------------------------------------------------------------------------------------
@@ -103,14 +102,12 @@ RUN python3 -m pip uninstall --break-system-packages -y numpy
 
 # Get packages -------------------------------------------------------------------------------------------
 WORKDIR ${ROS_WS}/src
-# message type
-COPY ${SHARED_ROS_RESOURCES}/anomaly_msg ./anomaly_msg/
+# needed for anomaly_msg type dependency, temp set to allie branch TODO change this to main
+RUN git clone --branch allie_sprint_1 https://github.com/JACart2/anomaly_detection.git
 RUN git clone https://github.com/rsasaki0109/lidar_localization_ros2.git
 RUN git clone https://github.com/rsasaki0109/ndt_omp_ros2.git
-#RUN git clone --branch display_global_path https://github.com/JACart2/ai-navigation.git
 RUN git clone --recursive --depth 1 --branch "${ZED_ROS2_WRAPPER_TAG}" https://github.com/stereolabs/zed-ros2-wrapper.git 
 RUN git clone https://github.com/stereolabs/zed-ros2-examples.git
-#RUN git clone --branch ros2 https://github.com/JACart2/LIO-SAM.git
 
 WORKDIR ${ROS_WS}
 
@@ -150,7 +147,7 @@ RUN wget -O /root/student_auth_setup.sh https://raw.githubusercontent.com/JACart
     chmod +x /root/student_auth_setup.sh
 
 # setup entrypoint
-COPY ./backend/entrypoint.sh /entrypoint.sh
+COPY ./entrypoint.sh /entrypoint.sh
 RUN chmod 755 /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
