@@ -54,7 +54,7 @@ services:
         target: /mnt/OA_SECRET.txt
       - type: bind
         source: $HOME/dev_ws/
-        target: /dev_ws/
+        target: /root/dev_ws/
     privileged: true
     runtime: nvidia
     network_mode: "host"
