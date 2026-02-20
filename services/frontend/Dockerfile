@@ -24,7 +24,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl gnupg ca-c
 WORKDIR /
 RUN git clone https://github.com/JACart2/ui.git
 WORKDIR /ui
-RUN git pull
 RUN npm install
 
 # Get student auth setup script

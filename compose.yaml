@@ -5,7 +5,7 @@ volumes:
 services:
   backend:
     build:
-      context: ./services/backend
+      context: ./services/backend/
       dockerfile: ./Dockerfile
     command: ros2 launch cart_launch autonomous_launcher.launch.py #can be overriden with $BACKEND_COMMAND
     environment:
@@ -28,7 +28,7 @@ services:
     network_mode: "host"
   frontend:
     build:
-      context: ./services/frontend
+      context: ./services/frontend/
       dockerfile: ./Dockerfile
     command: npm run dev #can be overriden with $FRONTEND_COMMAND
     environment:
