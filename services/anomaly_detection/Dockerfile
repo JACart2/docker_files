@@ -109,7 +109,7 @@ RUN pip3 install --force-reinstall --break-system-packages --no-cache-dir numpy=
 COPY ./requirements.txt /tmp/requirements.txt
 RUN pip3 install --no-cache-dir --break-system-packages -r /tmp/requirements.txt
 
-## this should be the root of wherever manager.py will exist
+## this should be the root of anomaly_detection, 
 WORKDIR /dev_ws/src/anomaly_detection
 
 # # initialize entrypoint, this gets access to the secret on the machine

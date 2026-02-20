@@ -44,7 +44,7 @@ services:
       dockerfile: ./Dockerfile
     depends_on:
       - backend
-    command: python3 manager.py
+    command: ros2 run anomaly_detection anomaly_detection_node
     environment:
       - ANOMALY_DETECTION_COMMAND # allows for default command override from entrypoint.sh
       - ROS_DOMAIN_ID=0
