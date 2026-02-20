@@ -3,6 +3,11 @@ export OA_SECRET=$(cat /mnt/OA_SECRET.txt)
 
 echo "OA_SECRET loaded (length: ${#OA_SECRET})"
 
+source "/opt/ros/jazzy/setup.bash" --
+if [ -f "/root/dev_ws/install/setup.bash" ]; then
+    source "/root/dev_ws/install/setup.bash" --
+fi
+
 
 # if no ANOMALY_DETECTION_COMMAND, default to compose.yml CMD. Otherwise, use ANOMALY_DETECTION_COMMAND
 if [[ -z "$ANOMALY_DETECTION_COMMAND" ]]; then

@@ -21,6 +21,7 @@ if command -v code &> /dev/null; then
 fi
 
 # Attach a terminal to the anomaly_detection
-docker compose exec -it -w /dev_ws anomaly_detection bash -c 'source /opt/ros/jazzy/setup.bash && source /opt/ros_ws/install/setup.bash && ([ -f /dev_ws/install/setup.bash ] && source /dev_ws/install/setup.bash); exec bash'
+docker compose exec -it -w /root/dev_ws anomaly_detection bash -c 'source /opt/ros/jazzy/setup.bash && source /opt/ros_ws/install/setup.bash && ([ -f /root/dev_ws/install/setup.bash ] && source /root/dev_ws/install/setup.bash); exec bash'
+
 
 

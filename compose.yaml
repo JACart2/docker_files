@@ -55,6 +55,10 @@ services:
       - type: bind
         source: $HOME/dev_ws/
         target: /root/dev_ws/
+      ## sourcing from /root/dev_ws fails to find this folder with existing install dir. This compensates for that. This dir exists in backend b/c it is built, but here we need to copy it over.
+      - type: bind
+        source: $HOME/dev_ws/
+        target: /opt/ros_ws
     privileged: true
     runtime: nvidia
     network_mode: "host"
