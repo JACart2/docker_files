@@ -53,8 +53,8 @@ services:
         source: $HOME/dev_ws/src/OA_SECRET.txt
         target: /mnt/OA_SECRET.txt
       - type: bind
-        source: $HOME/dev_ws/src
-        target: /dev_ws/src
+        source: $HOME/dev_ws/
+        target: /dev_ws/
     privileged: true
     runtime: nvidia
     network_mode: "host"
