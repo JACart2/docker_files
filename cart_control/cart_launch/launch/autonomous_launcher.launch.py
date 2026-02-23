@@ -24,12 +24,10 @@ def generate_launch_description():
     )
     declare_zed_front_serial = DeclareLaunchArgument(
         "zed_front_serial",
-        default_value="37963597",
         description="Serial number for zed_front camera",
     )
     declare_zed_rear_serial = DeclareLaunchArgument(
         "zed_rear_serial",
-        default_value="31061594",
         description="Serial number for zed_rear camera",
     )
 
