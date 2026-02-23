@@ -14,21 +14,19 @@ import launch_ros.events
 def generate_launch_description():
 
     console_start_delay_s = LaunchConfiguration("console_start_delay_s")
-    zed_front_serial = LaunchConfiguration("zed_front_serial")
-    zed_rear_serial = LaunchConfiguration("zed_rear_serial")
+    cart_config_path = LaunchConfiguration("cart_config_path")
 
     declare_console_start_delay_s = DeclareLaunchArgument(
         "console_start_delay_s",
         default_value="5.0",
         description="Delay (seconds) before launching the rest of the stack, to let swri_console start first.",
     )
-    declare_zed_front_serial = DeclareLaunchArgument(
-        "zed_front_serial",
-        description="Serial number for zed_front camera",
-    )
-    declare_zed_rear_serial = DeclareLaunchArgument(
-        "zed_rear_serial",
-        description="Serial number for zed_rear camera",
+    declare_cart_config_path = DeclareLaunchArgument(
+        "cart_config_path",
+        default_value=os.path.join(
+            get_package_share_directory("cart_launch"), "config", "cart_james.yaml"
+        ),
+        description="Path to cart-specific YAML config (must contain zed_front_serial and zed_rear_serial)",
     )
 
     swri_console_node = Node(
@@ -47,8 +45,7 @@ def generate_launch_description():
             ]
         ),
         launch_arguments={
-            "zed_front_serial": zed_front_serial,
-            "zed_rear_serial": zed_rear_serial,
+            "cart_config_path": cart_config_path,
         }.items(),
     )
 
@@ -102,8 +99,7 @@ def generate_launch_description():
     return LaunchDescription(
         [
             declare_console_start_delay_s,
-            declare_zed_front_serial,
-            declare_zed_rear_serial,
+            declare_cart_config_path,
             swri_console_node,
             delayed_stack,
         ]

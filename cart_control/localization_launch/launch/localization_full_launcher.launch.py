@@ -12,9 +12,7 @@ import os
 
 
 def generate_launch_description():
-
-    zed_front_serial = LaunchConfiguration("zed_front_serial")
-    zed_rear_serial = LaunchConfiguration("zed_rear_serial")
+    cart_config_path = LaunchConfiguration("cart_config_path")
 
     # Launch the velodyne_driver node for VLP16
     velodyne_driver_node = Node(
@@ -74,8 +72,7 @@ def generate_launch_description():
     cameras_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([cameras_launch_path]),
         launch_arguments={
-            "zed_front_serial": zed_front_serial,
-            "zed_rear_serial": zed_rear_serial,
+            "cart_config_path": cart_config_path,
         }.items(),
     )
 
@@ -83,12 +80,8 @@ def generate_launch_description():
     return LaunchDescription(
         [
             DeclareLaunchArgument(
-                "zed_front_serial",
-                description="Serial number for zed_front camera",
-            ),
-            DeclareLaunchArgument(
-                "zed_rear_serial",
-                description="Serial number for zed_rear camera",
+                "cart_config_path",
+                description="Path to cart-specific YAML config (must contain zed_front_serial and zed_rear_serial)",
             ),
             velodyne_driver_node,
             velodyne_transform_launch,
