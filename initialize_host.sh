@@ -30,4 +30,12 @@ else
   echo "WARNING: Velodyne not reachable at $VEL_IP (is it powered and plugged in?)"
 fi
 
+# Ensure firewall allows traffic from Velodyne
+if command -v ufw &> /dev/null; then
+  if sudo ufw status | grep -q "Status: active"; then
+      echo "Allowing traffic from $VEL_IP through UFW..."
+      sudo ufw allow from "$VEL_IP"
+  fi
+fi
+
 echo "Host initialization complete."
