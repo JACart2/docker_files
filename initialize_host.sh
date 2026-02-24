@@ -17,6 +17,14 @@ if ! ip link show "$IFACE" &>/dev/null; then
   exit 1
 fi
 
+# Ensure firewall allows traffic from Velodyne
+if command -v ufw &> /dev/null; then
+  if sudo ufw status | grep -q "Status: active"; then
+      echo "Allowing traffic from $VEL_IP through UFW..."
+      sudo ufw allow from "$VEL_IP"
+  fi
+fi
+
 # Assign (or replace) static IP on the ethernet interface
 sudo ip addr replace "$HOST_IP" dev "$IFACE"
 sudo ip link set "$IFACE" up
@@ -28,14 +36,6 @@ if ping -c 1 -W 1 "$VEL_IP" &>/dev/null; then
   echo "Velodyne reachable at $VEL_IP"
 else
   echo "WARNING: Velodyne not reachable at $VEL_IP (is it powered and plugged in?)"
-fi
-
-# Ensure firewall allows traffic from Velodyne
-if command -v ufw &> /dev/null; then
-  if sudo ufw status | grep -q "Status: active"; then
-      echo "Allowing traffic from $VEL_IP through UFW..."
-      sudo ufw allow from "$VEL_IP"
-  fi
 fi
 
 echo "Host initialization complete."
