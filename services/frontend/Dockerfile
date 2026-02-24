@@ -31,7 +31,7 @@ RUN wget -O /root/student_auth_setup.sh https://raw.githubusercontent.com/JACart
     chmod +x /root/student_auth_setup.sh
 
 # setup entrypoint
-COPY entrypoint.sh /entrypoint.sh
+COPY ./entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/bin/bash","/entrypoint.sh"]
 

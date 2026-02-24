@@ -10,9 +10,11 @@ services:
     command: ros2 launch cart_launch autonomous_launcher.launch.py #can be overriden with $BACKEND_COMMAND
     environment:
       - BACKEND_COMMAND #will override the default command above
+      - ROS_DOMAIN_ID=0
       - $HOME/.ssh:/root/.ssh
       - $HOME/.gitconfig:/root/.gitconfig
       - DISPLAY
+      - XDG_RUNTIME_DIR
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
       - $HOME/.Xauthority:/root/.Xauthority
@@ -36,3 +38,28 @@ services:
     volumes:
       - $HOME/.ssh:/root/.ssh
       - ui:/ui
+  anomaly_detection:
+    build:
+      context: ./services/anomaly_detection
+      dockerfile: ./Dockerfile
+    depends_on:
+      - backend
+    command: ros2 run anomaly_detection anomaly_detection_node
+    environment:
+      - ANOMALY_DETECTION_COMMAND # allows for default command override from entrypoint.sh
+      - ROS_DOMAIN_ID=0
+    volumes:
+      - type: bind
+        source: $HOME/dev_ws/src/OA_SECRET.txt
+        target: /mnt/OA_SECRET.txt
+      - type: bind
+        source: $HOME/dev_ws/
+        target: /root/dev_ws/
+      ## sourcing from /root/dev_ws fails to find this folder with existing install dir. This compensates for that. This dir exists in backend b/c it is built, but here we need to copy it over.
+      - type: bind
+        source: $HOME/dev_ws/
+        target: /opt/ros_ws
+    privileged: true
+    runtime: nvidia
+    network_mode: "host"
+    ipc: "host"

@@ -4,7 +4,7 @@ bash ./initialize_host.sh
 
 STALL="tail -f /dev/null"
 
-FRONTEND_COMMAND=$STALL BACKEND_COMMAND=$STALL docker compose up --build --remove-orphans --force-recreate -d
+FRONTEND_COMMAND=$STALL BACKEND_COMMAND=$STALL docker compose up frontend backend --build --remove-orphans --force-recreate -d
 
 # Launch VS Code attached to the container
 if command -v code &> /dev/null; then
