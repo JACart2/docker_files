@@ -122,6 +122,16 @@ sudo udevadm control --reload-rules
 sudo udevadm trigger
 
 # -------------------------
+# Configure Velodyne network (persistent)
+# -------------------------
+if [ -f "./scripts/velodyne-net-setup.sh" ]; then
+  echo "==> Configuring Velodyne network (persistent)"
+  ./scripts/velodyne-net-setup.sh
+else
+  echo "WARNING: ./scripts/velodyne-net-setup.sh not found. Skipping Velodyne network setup."
+fi
+
+# -------------------------
 # Install & Configure Conky
 # -------------------------
 echo "==> Installing Conky (system monitor)"
