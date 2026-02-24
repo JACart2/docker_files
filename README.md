@@ -64,6 +64,15 @@ To start the containers in a detached state and attach an interactive terminal t
 
 ## Utility Scripts
 *   `setup_cart_host_ubuntu24.sh`: One-stop setup for a fresh Ubuntu 24.04 machine.
+*   `velodyne-net-setup.sh`: Sets up a static IP for the Velodyne LIDAR subnet (default: 192.168.1.254/24) on a suitable ethernet interface and configures a persistent systemd service to apply this at boot.
+
+    > **Warning:** This will make the selected ethernet port unavailable for internet access while configured for the Velodyne network.
+
+    You can override the default interface and IP using the `IFACE` and `HOST_IP` environment variables:
+    ```bash
+    IFACE=enp0s31f6 HOST_IP=192.168.1.100/24 ./scripts/velodyne-net-setup.sh
+    ```
+    After running, the network configuration will persist across reboots.
 *   `initialize_host.sh`: Configures host network headers for Velodyne (IP 192.168.1.254) and X11 display permissions. **Run automatically** by start scripts.
 *   `compose.yaml`: Defines the `backend` (ROS 2) and `frontend` (Web UI) services running in host network mode.
 *   `dockerTeardown.sh`: Forcefully stops running containers.
