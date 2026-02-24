@@ -21,6 +21,11 @@ Docker setup for running the JACart software stack using **ROS 2 Jazzy** on **Ub
 ### Part 2: User Account Setup
 *Perform this for every user account that will use this software.*
 
+**Option 1: Automatic user account setup**
+1.  Create a text file (ex. usernames.txt) with each username you want to add on a new line.
+2.  Run the create_users script, passing 'usernames.txt' as a command line argument.
+
+**Option 2: Manual user account setup**
 1.  Clone this repository (if you haven't already).
 2.  Clone the `ai_navigation` repository into `~/dev_ws`:
     ```bash
@@ -64,6 +69,7 @@ To start the containers in a detached state and attach an interactive terminal t
 
 ## Utility Scripts
 *   `setup_cart_host_ubuntu24.sh`: One-stop setup for a fresh Ubuntu 24.04 machine.
+*   `create_users.sh`: Creates a batch of new users with a preconfigured home directory.
 *   `initialize_host.sh`: Configures host network headers for Velodyne (IP 192.168.1.254) and X11 display permissions. **Run automatically** by start scripts.
 *   `compose.yaml`: Defines the `backend` (ROS 2) and `frontend` (Web UI) services running in host network mode.
 *   `dockerTeardown.sh`: Forcefully stops running containers.
