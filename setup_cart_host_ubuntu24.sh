@@ -9,6 +9,20 @@ if [[ "$(lsb_release -rs 2>/dev/null || true)" != "24.04" ]]; then
   echo "WARNING: This script is intended for Ubuntu 24.04. Continuing anyway..."
 fi
 
+# Ask user for machine info (NVIDIA propietary libraries issue) - solved by Ethan Gill - Spring'26
+# BLACKWELL_DETOUR will use a detour to install third party drivers if yes.
+while true; do
+	read -r -e -p "Is this GPU a NVIDIA Blackwell 5000? (Y/n): " BLACKWELL_DETOUR
+	# validate
+	if [[ "$BLACKWELL_DETOUR" =~ ^[YyNn]$ ]]; then
+		break
+	else
+		echo "Invalid input. Please enter y or n"
+	fi
+done
+# BLACKWELL_DETOUR is used again in NVIDIA Container Toolkit section...
+
+# Prepare apt
 echo "==> Updating apt indices"
 sudo apt-get update -y
 sudo apt-get install -y ca-certificates curl gnupg lsb-release wget software-properties-common
@@ -58,14 +72,32 @@ https://download.docker.com/linux/ubuntu noble stable" \
 # NVIDIA Container Toolkit repo
 # -------------------------
 echo "==> Installing NVIDIA Container Toolkit repo"
-# From NVIDIA Container Toolkit install guide :contentReference[oaicite:8]{index=8}
-curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey \
-  | sudo gpg --dearmor -o /etc/apt/keyrings/nvidia-container-toolkit.gpg
-sudo chmod a+r /etc/apt/keyrings/nvidia-container-toolkit.gpg
+# GPU does not use proprietary drivers from NVIDIA
+if [[ "$BLACKWELL_DETOUR" =~ ^[Yy]$ ]]; then
+	# From jatinkrmalik GitHub Gist page, "The Ultimate Guide to Installing RTX 5000 Blackwell Drivers on Linux [2026]
+	# source link: https://gist.github.com/jatinkrmalik/86afb07cbe6abf5baa2d29d3842aa328
+	sudo apt install pkg-config libglvnd-dev dkms build-essential libegl-dev libegl1 libgl-dev libgl1 libgles-dev libgles1 libglvnd-core-dev libglx-dev libopengl-dev gcc make
+	sudo add-apt-repository ppa:graphics-drivers/ppa
+	sudo apt update
+	# NOTE: hardcoded driver version
+	echo "WARNING: This script is using a hardcoded driver version {nvidia-driver-580-open}"
+	sudo apt install nvidia-driver-580-open
+	sudo apt install -y nvidia-container-toolkit
+	echo "NVIDIA drivers installed. Reboot required."
+# GPU uses proprietary drivers from NVIDIA
+elif [[ "$BLACKWELL_DETOUR" =~ ^[Nn]$ ]]; then
+	# From NVIDIA Container Toolkit install guide :contentReference[oaicite:8]{index=8}
+	curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey \
+	  | sudo gpg --dearmor -o /etc/apt/keyrings/nvidia-container-toolkit.gpg
+	sudo chmod a+r /etc/apt/keyrings/nvidia-container-toolkit.gpg
 
-curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list \
-  | sed 's#deb https://#deb [signed-by=/etc/apt/keyrings/nvidia-container-toolkit.gpg] https://#g' \
-  | sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list > /dev/null
+	curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list \
+	  | sed 's#deb https://#deb [signed-by=/etc/apt/keyrings/nvidia-container-toolkit.gpg] https://#g' \
+	  | sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list > /dev/null
+else
+	echo "WARNING: NVIDIA Toolkit not installed"
+fi
+
 
 # -------------------------
 # Install packages
@@ -157,6 +189,7 @@ EOF
 echo
 echo "==> Done."
 echo "Notes:"
+echo "  - You may need to reboot for NVIDIA drivers to take effect."
 echo "  - You may need to log out/in for docker group changes to take effect."
 echo "  - To test Docker:        docker run --rm hello-world"
 echo "  - To test NVIDIA Docker: docker run --rm --gpus all nvidia/cuda:12.8.0-base-ubuntu24.04 nvidia-smi"
