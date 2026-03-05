@@ -13,7 +13,7 @@ if command -v code &> /dev/null; then
         CONTAINER_NAME=$(docker inspect --format '{{.Name}}' $CONTAINER_ID | sed 's/^\///')
         if [ -n "$CONTAINER_NAME" ]; then
              HEX_NAME=$(printf "$CONTAINER_NAME" | od -A n -t x1 | tr -d ' \n')
-             URI="vscode-remote://attached-container+${HEX_NAME}/dev_ws"
+             URI="vscode-remote://attached-container+${HEX_NAME}/root/dev_ws"
              echo "Opening VS Code attached to ${CONTAINER_NAME}..."
              code --folder-uri "$URI"
         fi
