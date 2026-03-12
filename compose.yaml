@@ -32,14 +32,14 @@ services:
       dockerfile: ./Dockerfile
     working_dir: /root/dev_ws/src/ui
     command: npm run dev
-   environment:
+    environment:
       - FRONTEND_COMMAND #will override the default command above
       - $HOME/.gitconfig:/root/.gitconfig
     network_mode: "host"
     volumes:
       - $HOME/.ssh:/root/.ssh
       # No more ui volume — code is baked into the image
-   anomaly_detection:
+  anomaly_detection:
     build:
       context: ./services/anomaly_detection
       dockerfile: ./Dockerfile
