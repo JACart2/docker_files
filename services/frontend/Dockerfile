@@ -20,10 +20,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl gnupg ca-c
     apt-get update && \
     apt-get install -y gh
 
-# get source code
-WORKDIR /root/dev_ws
+# get source code — clone into ~/dev_ws/src/ui instead of /ui
+WORKDIR /root/dev_ws/src
 RUN git clone https://github.com/JACart2/ui.git
-WORKDIR /root/dev_ws/ui
+WORKDIR /root/dev_ws/src/ui
 RUN npm install
 
 # Get student auth setup script
@@ -37,4 +37,3 @@ ENTRYPOINT ["/bin/bash","/entrypoint.sh"]
 
 # install neovim for development in container
 RUN apt-get install -y neovim
-
