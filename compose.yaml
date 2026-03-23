@@ -38,7 +38,9 @@ services:
     network_mode: "host"
     volumes:
       - $HOME/.ssh:/root/.ssh
-      # No more ui volume — code is baked into the image
+      - type: bind
+        source: $HOME/dev_ws
+        target: /root/dev_ws
   anomaly_detection:
     build:
       context: ./services/anomaly_detection
