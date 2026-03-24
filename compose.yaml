@@ -39,8 +39,8 @@ services:
     volumes:
       - $HOME/.ssh:/root/.ssh
       - type: bind
-        source: $HOME/dev_ws
-        target: /root/dev_ws
+        source: $HOME/ui
+        target: /root/ui
   anomaly_detection:
     build:
       context: ./services/anomaly_detection
