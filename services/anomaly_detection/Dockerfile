@@ -49,7 +49,7 @@ RUN pip3 install  --break-system-packages --no-cache-dir numpy==1.26.4
 
 ## installing python packages from requirements.txt
 COPY ./requirements.txt /tmp/requirements.txt
-RUN pip3 install --no-cache-dir --break-system-packages -r /tmp/requirements.txt
+RUN pip3 install --no-cache-dir --break-system-packages --ignore-installed -r /tmp/requirements.txt
 
 ## this should be the root of anomaly_detection, 
 WORKDIR /root/dev_ws/src/anomaly_detection
