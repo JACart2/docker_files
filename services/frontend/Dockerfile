@@ -20,11 +20,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl gnupg ca-c
     apt-get update && \
     apt-get install -y gh
 
-# get source code — clone into ~/dev_ws/src/ui instead of /ui
-WORKDIR /root/dev_ws/src
-RUN git clone https://github.com/JACart2/ui.git
-WORKDIR /root/dev_ws/src/ui
-RUN npm install
+# This should be done manually on setup, not within image, document comment then can be deleted.
+# WORKDIR /root/ui
+# RUN git clone https://github.com/JACart2/ui.git
+# WORKDIR /root/ui
+# RUN npm install
 
 # Get student auth setup script
 RUN wget -O /root/student_auth_setup.sh https://raw.githubusercontent.com/JACart2/docker_files/main/student_auth_setup.sh && \
