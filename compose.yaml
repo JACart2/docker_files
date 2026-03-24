@@ -30,7 +30,7 @@ services:
     build:
       context: ./services/frontend/
       dockerfile: ./Dockerfile
-    working_dir: /root/dev_ws/src/ui
+    working_dir: /root/ui
     command: npm run dev
     environment:
       - FRONTEND_COMMAND #will override the default command above
