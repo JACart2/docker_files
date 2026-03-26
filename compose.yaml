@@ -41,6 +41,7 @@ services:
       - type: bind
         source: $HOME/ui
         target: /root/ui
+      - ui:/root/ui/node_modules
   anomaly_detection:
     build:
       context: ./services/anomaly_detection
