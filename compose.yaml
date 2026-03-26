@@ -30,14 +30,18 @@ services:
     build:
       context: ./services/frontend/
       dockerfile: ./Dockerfile
-    command: npm run dev #can be overriden with $FRONTEND_COMMAND
+    working_dir: /root/ui
+    command: npm run dev
     environment:
       - FRONTEND_COMMAND #will override the default command above
       - $HOME/.gitconfig:/root/.gitconfig
     network_mode: "host"
     volumes:
       - $HOME/.ssh:/root/.ssh
-      - ui:/ui
+      - type: bind
+        source: $HOME/ui
+        target: /root/ui
+      - ui:/root/ui/node_modules
   anomaly_detection:
     build:
       context: ./services/anomaly_detection
