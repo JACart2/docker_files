@@ -1,18 +1,20 @@
 #!/bin/bash
+set -e
 
-if [[ -z "$FRONTEND_COMMAND" ]]; then
-  exec "$@"
+# Match docker-compose working_dir
+cd /root/ui
+
+# Optional: update if it's a git repo
+if [ -d ".git" ]; then
+  echo "Updating UI from GitHub..."
+  git pull origin main || echo "Warning: Git pull failed, using existing code."
+fi
+
+echo "Installing npm dependencies..."
+npm install
+
+if [[ -n "$FRONTEND_COMMAND" ]]; then
+  exec bash -lc "$FRONTEND_COMMAND"
 else
-  # Update UI code from GitHub (if /ui is a git repo)
-  if [ -d "/ui/.git" ]; then
-    echo "Updating UI from GitHub..."
-    cd /ui
-    git pull origin main || echo "Warning: Git pull failed, using existing code."
-    npm install || echo "Warning: npm install failed."
-  else
-    echo "Error: /ui is not a Git repository. Cannot update UI."
-  fi
-
-  # Execute the frontend command
-  bash -c "$FRONTEND_COMMAND"
+  exec "$@"
 fi
