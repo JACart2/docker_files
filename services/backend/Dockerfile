@@ -103,7 +103,7 @@ RUN python3 -m pip uninstall --break-system-packages -y numpy
 # Get packages -------------------------------------------------------------------------------------------
 WORKDIR ${ROS_WS}/src
 # needed for anomaly_msg type dependency
-RUN git clone --branch allie_sprint1 https://github.com/JACart2/anomaly_detection.git
+RUN git clone https://github.com/JACart2/anomaly_detection.git 
 RUN git clone https://github.com/rsasaki0109/lidar_localization_ros2.git
 RUN git clone https://github.com/rsasaki0109/ndt_omp_ros2.git
 RUN git clone --recursive --depth 1 --branch "${ZED_ROS2_WRAPPER_TAG}" https://github.com/stereolabs/zed-ros2-wrapper.git 
@@ -151,3 +151,12 @@ COPY ./entrypoint.sh /entrypoint.sh
 RUN chmod 755 /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
+
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y \
+      ros-jazzy-mola \
+      ros-jazzy-mola-state-estimation \
+      ros-jazzy-mola-lidar-odometry \
+      ros-jazzy-mola-viz; \
+    rm -rf /var/lib/apt/lists/*
