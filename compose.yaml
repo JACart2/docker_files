@@ -63,7 +63,7 @@ services:
       ## this is the ollama cli container can use to serve and kill LLM instance
       - type: bind 
         source: /usr/local/bin/ollama
-        target: /usr/local/bin/ollama:ro
+        target: /usr/local/bin/ollama
 
     privileged: true
     runtime: nvidia
