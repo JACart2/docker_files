@@ -68,6 +68,7 @@ RUN set -eux; \
       python3-rosdep \
       python3-colcon-common-extensions \
       python3-vcstool \
+      python3-empy \
       build-essential \
       git; \
     rm -rf /var/lib/apt/lists/*
@@ -81,6 +82,8 @@ RUN set -eux; \
     ros-jazzy-rosbridge-server \
     ros-jazzy-tf-transformations \
     ros-jazzy-pointcloud-to-laserscan \
+    libyaml-cpp-dev \
+    libudev-dev \
     python3-transforms3d \
     python3-networkx \
     python3-serial \
