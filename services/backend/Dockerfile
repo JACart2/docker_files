@@ -11,6 +11,7 @@ ARG ROS_META_PKG=ros-jazzy-desktop
 # Pin the ZED ROS2 wrapper to match ZED SDK 5.1
 # (Tags are in the repo; master expects SDK v5.1.) 
 ARG ZED_ROS2_WRAPPER_TAG=humble-v5.1.0
+ARG INERTIAL_SENSE_SDK_TAG=2.6.0
 ARG ROS_WS=/opt/ros_ws
 
 
@@ -111,6 +112,8 @@ RUN git clone https://github.com/rsasaki0109/lidar_localization_ros2.git
 RUN git clone https://github.com/rsasaki0109/ndt_omp_ros2.git
 RUN git clone --recursive --depth 1 --branch "${ZED_ROS2_WRAPPER_TAG}" https://github.com/stereolabs/zed-ros2-wrapper.git 
 RUN git clone https://github.com/stereolabs/zed-ros2-examples.git
+RUN git clone --recursive --branch "${INERTIAL_SENSE_SDK_TAG}" https://github.com/inertialsense/inertial-sense-sdk.git && \
+    ln -s inertial-sense-sdk/ROS/ros2 inertial_sense_ros2
 
 WORKDIR ${ROS_WS}
 
