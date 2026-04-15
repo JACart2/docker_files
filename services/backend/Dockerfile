@@ -11,7 +11,6 @@ ARG ROS_META_PKG=ros-jazzy-desktop
 # Pin the ZED ROS2 wrapper to match ZED SDK 5.1
 # (Tags are in the repo; master expects SDK v5.1.) 
 ARG ZED_ROS2_WRAPPER_TAG=humble-v5.1.0
-ARG INERTIAL_SENSE_SDK_TAG=2.6.0
 ARG ROS_WS=/opt/ros_ws
 
 
@@ -83,8 +82,6 @@ RUN set -eux; \
     ros-jazzy-rosbridge-server \
     ros-jazzy-tf-transformations \
     ros-jazzy-pointcloud-to-laserscan \
-    libyaml-cpp-dev \
-    libudev-dev \
     python3-transforms3d \
     python3-networkx \
     python3-serial \
@@ -112,8 +109,22 @@ RUN git clone https://github.com/rsasaki0109/lidar_localization_ros2.git
 RUN git clone https://github.com/rsasaki0109/ndt_omp_ros2.git
 RUN git clone --recursive --depth 1 --branch "${ZED_ROS2_WRAPPER_TAG}" https://github.com/stereolabs/zed-ros2-wrapper.git 
 RUN git clone https://github.com/stereolabs/zed-ros2-examples.git
+
+# ============================================================================
+# IMU SENSOR SUPPORT (InertialSense SDK)
+# Comment out this entire section if IMU sensor is not needed.
+# Also remove 'src/inertial-sense-sdk/ROS/ros2' from --base-paths in the
+# colcon build step below.
+# ============================================================================
+ARG INERTIAL_SENSE_SDK_TAG=2.6.0
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libyaml-cpp-dev \
+    libudev-dev \
+  && rm -rf /var/lib/apt/lists/*
 RUN git clone --recursive --branch "${INERTIAL_SENSE_SDK_TAG}" https://github.com/inertialsense/inertial-sense-sdk.git && \
-    ln -s inertial-sense-sdk/ROS/ros2 inertial_sense_ros2
+  cd inertial-sense-sdk/ROS && \
+  mkdir -p inertial-sense-sdk/scripts && \
+  ln -sfn ../../../scripts/build_is_sdk.sh inertial-sense-sdk/scripts/build_is_sdk.sh
 
 WORKDIR ${ROS_WS}
 
@@ -122,14 +133,18 @@ WORKDIR ${ROS_WS}
 RUN rosdep init && rosdep update
 
 # build
-RUN /bin/bash -c "source /opt/ros/jazzy/setup.bash && \
-  apt-get update -y || true && \
-  rosdep install --from-paths src --ignore-src -r -y && \
+RUN set -eo pipefail; \
+  source /opt/ros/jazzy/setup.bash; \
+  apt-get update -y || true; \
+  rosdep install --from-paths src --ignore-src -r -y; \
   colcon build --parallel-workers $(nproc) --symlink-install \
-  --event-handlers console_direct+ --base-paths src \
-  --cmake-args ' -DCMAKE_BUILD_TYPE=Release' \
-  ' -DCMAKE_LIBRARY_PATH=/usr/local/cuda/lib64/stubs' \
-  ' -DCMAKE_CXX_FLAGS="-Wl,--allow-shlib-undefined"' "
+    --event-handlers console_direct+ \
+    --base-paths src src/inertial-sense-sdk/ROS/ros2 \
+    --cmake-args \
+      -DBUILD_TESTING=OFF \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DCMAKE_LIBRARY_PATH=/usr/local/cuda/lib64/stubs \
+      -DCMAKE_CXX_FLAGS=-Wl,--allow-shlib-undefined
 
 
 # Can these dependencies below be defined in the respective packages package.xml and then installed with rosdep?
