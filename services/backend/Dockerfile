@@ -11,6 +11,7 @@ ARG ROS_META_PKG=ros-jazzy-desktop
 # Pin the ZED ROS2 wrapper to match ZED SDK 5.1
 # (Tags are in the repo; master expects SDK v5.1.) 
 ARG ZED_ROS2_WRAPPER_TAG=humble-v5.1.0
+ARG MMWAVE_TI_ROS_REF=93dbd1a165789744838eb7efa294a2b7c36e6d91
 ARG ROS_WS=/opt/ros_ws
 
 
@@ -79,8 +80,11 @@ RUN set -eux; \
     apt-get update; \
     apt-get install -y ros-jazzy-velodyne \
     ros-jazzy-rosbridge-server \
+    ros-jazzy-pcl-conversions \
     ros-jazzy-tf-transformations \
+    ros-jazzy-tf2-geometry-msgs \
     ros-jazzy-pointcloud-to-laserscan \
+    libpcl-dev \
     python3-transforms3d \
     python3-networkx \
     python3-serial \
@@ -108,6 +112,72 @@ RUN git clone https://github.com/rsasaki0109/lidar_localization_ros2.git
 RUN git clone https://github.com/rsasaki0109/ndt_omp_ros2.git
 RUN git clone --recursive --depth 1 --branch "${ZED_ROS2_WRAPPER_TAG}" https://github.com/stereolabs/zed-ros2-wrapper.git 
 RUN git clone https://github.com/stereolabs/zed-ros2-examples.git
+RUN set -eux; \
+    git clone https://git.ti.com/git/mmwave_radar/mmwave_ti_ros.git; \
+    git -C mmwave_ti_ros checkout "${MMWAVE_TI_ROS_REF}"; \
+    touch mmwave_ti_ros/ros1_driver/COLCON_IGNORE; \
+    touch mmwave_ti_ros/autonomous_robotics_ros/COLCON_IGNORE; \
+    python3 - <<'INNER_PY'
+from pathlib import Path
+
+path = Path('/opt/ros_ws/src/mmwave_ti_ros/ros2_driver/src/ti_mmwave_rospkg/launch/6843AOP_Standard.py')
+text = path.read_text()
+
+old_args = """    rviz_arg = DeclareLaunchArgument('rviz', default_value='true', description='Enable RViz')\n"""
+new_args = """    cfg_file_arg = DeclareLaunchArgument(
+        'cfg_file',
+        default_value='6843AOP_Standard.cfg',
+        description='TI radar configuration file to load through IWR6843.py',
+    )
+
+    command_port_arg = DeclareLaunchArgument(
+        'command_port',
+        default_value='/dev/ttyUSB0',
+        description='Serial port used by the TI radar command interface',
+    )
+
+    data_port_arg = DeclareLaunchArgument(
+        'data_port',
+        default_value='/dev/ttyUSB1',
+        description='Serial port used by the TI radar data interface',
+    )
+
+    rviz_arg = DeclareLaunchArgument('rviz', default_value='true', description='Enable RViz')\n"""
+
+old_launch_args = """        launch_arguments={
+            "cfg_file": '6843AOP_Standard.cfg',
+            "command_port": "/dev/ttyUSB0",
+            "data_port": "/dev/ttyUSB1",
+            "rviz": LaunchConfiguration('rviz'),
+        }.items()
+"""
+new_launch_args = """        launch_arguments={
+            "cfg_file": LaunchConfiguration('cfg_file'),
+            "command_port": LaunchConfiguration('command_port'),
+            "data_port": LaunchConfiguration('data_port'),
+            "rviz": LaunchConfiguration('rviz'),
+        }.items()
+"""
+
+old_ld = """    ld = LaunchDescription()
+    ld.add_action(rviz_arg)
+"""
+new_ld = """    ld = LaunchDescription()
+    ld.add_action(cfg_file_arg)
+    ld.add_action(command_port_arg)
+    ld.add_action(data_port_arg)
+    ld.add_action(rviz_arg)
+"""
+
+if old_args not in text or old_launch_args not in text or old_ld not in text:
+    raise SystemExit('Unexpected upstream 6843AOP_Standard.py contents')
+
+text = text.replace(old_args, new_args, 1)
+text = text.replace(old_launch_args, new_launch_args, 1)
+text = text.replace(old_ld, new_ld, 1)
+path.write_text(text)
+INNER_PY
+
 
 WORKDIR ${ROS_WS}
 
