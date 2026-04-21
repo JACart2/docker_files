@@ -7,7 +7,7 @@ services:
     build:
       context: ./services/backend/
       dockerfile: ./Dockerfile
-    command: ros2 launch cart_launch autonomous_launcher.launch.py #can be overriden with $BACKEND_COMMAND
+    command: bash -c "ros2 launch rosbridge_server rosbridge_websocket_launch.xml & ros2 launch cart_launch autonomous_launcher.launch.py" #can be overriden with $BACKEND_COMMAND
     environment:
       - BACKEND_COMMAND #will override the default command above
       - ROS_DOMAIN_ID=0
