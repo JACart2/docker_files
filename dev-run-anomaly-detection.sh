@@ -15,7 +15,7 @@ open_browser_when_ready () {
 
 STALL="tail -f /dev/null"
 
-ANOMALY_DETECTION_COMMAND=$STALL docker compose up --build --remove-orphans --force-recreate 
+ANOMALY_DETECTION_COMMAND=$STALL BACKEND_COMMAND=$STALL docker compose up --build --remove-orphans --force-recreate 
 
 # Launch VS Code attached to the container
 if command -v code &> /dev/null; then
