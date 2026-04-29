@@ -14,8 +14,10 @@ open_browser_when_ready () {
 }
 
 STALL="tail -f /dev/null"
+MADISON_CONFIG="cd ~/dev_ws && ros2 launch cart_launch autonomous_launcher.launch.py cart_config_path:=./src/ai-navigation/cart_control/cart_launch/config/cart_madison.yaml"
+ANOMALY_LAUNCH="cd ~/dev_ws && ros2 launch anomaly_detection anomaly_detection.launch.py"
 
-ANOMALY_DETECTION_COMMAND=$STALL BACKEND_COMMAND=$STALL docker compose up --build --remove-orphans --force-recreate 
+ANOMALY_DETECTION_COMMAND=$ANOMALY_LAUNCH   docker compose up --build --remove-orphans --force-recreate 
 
 # Launch VS Code attached to the container
 if command -v code &> /dev/null; then
