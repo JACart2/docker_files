@@ -10,9 +10,9 @@ CART_PORT="${CART_PORT:-9090}"
 API_PORT="${API_PORT:-8000}"
 
 # How often to *probe* the dashboard when it's down / between attempts
-REREGISTER_INTERVAL_SEC="${REREGISTER_INTERVAL_SEC:-30}"
+REREGISTER_INTERVAL_SEC="${REREGISTER_INTERVAL_SEC:-15}"
 # Minimum time between successful registrations
-REGISTER_COOLDOWN_SEC="${REGISTER_COOLDOWN_SEC:-300}"   # 5 minutes
+REGISTER_COOLDOWN_SEC="${REGISTER_COOLDOWN_SEC:-15}"   # 15 seconds
 
 bash ./initialize_host.sh
 
