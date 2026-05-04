@@ -110,6 +110,10 @@ RUN git clone https://github.com/rsasaki0109/ndt_omp_ros2.git
 RUN git clone --recursive --depth 1 --branch "${ZED_ROS2_WRAPPER_TAG}" https://github.com/stereolabs/zed-ros2-wrapper.git 
 RUN git clone https://github.com/stereolabs/zed-ros2-examples.git
 
+RUN git clone https://github.com/MOLAorg/mola_sm_loop_closure.git src/mola_sm_loop_closure
+RUN git -C src/mola_sm_loop_closure submodule update --init --recursive
+
+
 # ============================================================================
 # IMU SENSOR SUPPORT (InertialSense SDK)
 # Comment out this entire section if IMU sensor is not needed.
@@ -181,3 +185,5 @@ RUN set -eux; \
       ros-jazzy-mola-lidar-odometry \
       ros-jazzy-mola-viz; \
     rm -rf /var/lib/apt/lists/*
+
+WORKDIR ${ROS_WS}
