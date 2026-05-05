@@ -17,22 +17,23 @@ REGISTER_COOLDOWN_SEC="${REGISTER_COOLDOWN_SEC:-15}"   # 15 seconds
 bash ./initialize_host.sh
 
 wait_for_frontend () {
-  until curl -fsS http://localhost:5173 >/dev/null; do
+  until curl -fsS http://localhost:5173 >/dev/null 2>&1; do
     sleep 2
   done
 }
 
 dashboard_up () {
-  curl -fsS "http://${SERVER_IP}:${API_PORT}/" >/dev/null
+  # Only check, don't fail script if dashboard is unreachable
+  curl -fsS "http://${SERVER_IP}:${API_PORT}/" >/dev/null 2>&1
 }
 
 register_cart () {
+  # Ignore failure, always return true
   curl -fsS -X POST "http://${SERVER_IP}:${API_PORT}/api/vehicles/register" \
     -H "Content-Type: application/json" \
-    -d "{\"name\":\"${CART_NAME}\",\"port\":${CART_PORT}}"
+    -d "{\"name\":\"${CART_NAME}\",\"port\":${CART_PORT}}" >/dev/null 2>&1 || true
 }
 
-# Background loop: if dashboard is up, try (re)registering occasionally
 reregister_loop () {
   local last_ok=0
   while true; do
@@ -42,9 +43,8 @@ reregister_loop () {
 
       # only re-register if we haven't done so recently
       if (( now - last_ok >= REGISTER_COOLDOWN_SEC )); then
-        if register_cart; then
-          last_ok="$now"
-        fi
+        register_cart
+        last_ok="$now"
       fi
     fi
 
