@@ -20,6 +20,7 @@ services:
       - $HOME/.Xauthority:/root/.Xauthority
       - /dev:/dev
       - zed_resources:/usr/local/zed/resources
+      - /usr/local/zed/settings:/usr/local/zed/settings
       - type: bind
         source: $HOME/dev_ws
         target: /root/dev_ws

@@ -3,6 +3,8 @@
 bash ./initialize_host.sh
 
 
+
+
 open_browser_when_ready() {
     local port=$1
 	until curl -s http://localhost:$port > /dev/null
@@ -13,6 +15,21 @@ open_browser_when_ready() {
 	done
 	open http://localhost:$port
 }
+check_internet() {
+    # Try reaching Docker Hub (fast + relevant to your issue)
+    curl -s --head https://auth.docker.io > /dev/null
+    return $?
+}
+
+# Decide compose flags based on connectivity
+if check_internet; then
+    echo "Internet detected: using normal docker compose build"
+    COMPOSE_FLAGS="--build --remove-orphans --force-recreate"
+else
+    echo "No internet detected: using cached images only"
+    COMPOSE_FLAGS=" --pull=never --remove-orphans --force-recreate"
+fi
+
 
 STALL="tail -f /dev/null"
 MADISON_CONFIG="cd ~/dev_ws && ros2 launch cart_launch autonomous_launcher.launch.py cart_config_path:=./src/ai-navigation/cart_control/cart_launch/config/cart_madison.yaml"
@@ -20,7 +37,7 @@ JAMES_CONFIG="cd ~/dev_ws && ros2 launch cart_launch autonomous_launcher.launch.
 
 ANOMALY_LAUNCH="cd ~/dev_ws && ros2 launch anomaly_detection anomaly_detection.launch.py "
 
-ANOMALY_DETECTION_COMMAND=$ANOMALY_LAUNCH  BACKEND_COMMAND=$JAMES_CONFIG docker compose up --build --remove-orphans --force-recreate 
+ANOMALY_DETECTION_COMMAND=$ANOMALY_LAUNCH  BACKEND_COMMAND=$JAMES_CONFIG docker compose up $COMPOSE_FLAGS
 
 # Launch VS Code attached to the container
 if command -v code &> /dev/null; then
