@@ -37,7 +37,7 @@ JAMES_CONFIG="cd ~/dev_ws && ros2 launch cart_launch autonomous_launcher.launch.
 
 ANOMALY_LAUNCH="cd ~/dev_ws && ros2 launch anomaly_detection anomaly_detection.launch.py "
 
-ANOMALY_DETECTION_COMMAND=$ANOMALY_LAUNCH  BACKEND_COMMAND=$JAMES_CONFIG docker compose up $COMPOSE_FLAGS
+ANOMALY_DETECTION_COMMAND=$ANOMALY_LAUNCH  BACKEND_COMMAND=$MADISON_CONFIG docker compose up $COMPOSE_FLAGS
 
 # Launch VS Code attached to the container
 if command -v code &> /dev/null; then
