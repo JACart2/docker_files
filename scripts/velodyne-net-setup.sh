@@ -30,34 +30,18 @@ if [[ -z "$IFACE" ]]; then
   exit 1
 fi
 
-sudo tee /usr/local/bin/velodyne-net.sh >/dev/null <<EOF
-#!/usr/bin/env bash
-set -euo pipefail
-IFACE="$IFACE"
-HOST_IP="$HOST_IP"
+# Remove any existing velodyne static connection so we can recreate it cleanly.
+sudo nmcli con delete velodyne-static 2>/dev/null || true
 
-/sbin/ip addr replace "$HOST_IP" dev "$IFACE"
-/sbin/ip link set "$IFACE" up
-EOF
+sudo nmcli con add \
+  type ethernet \
+  con-name velodyne-static \
+  ifname "$IFACE" \
+  ipv4.method manual \
+  ipv4.addresses "$HOST_IP" \
+  ipv6.method ignore \
+  connection.autoconnect yes
 
-sudo chmod +x /usr/local/bin/velodyne-net.sh
+sudo nmcli con up velodyne-static
 
-sudo tee /etc/systemd/system/velodyne-net.service >/dev/null <<'EOF'
-[Unit]
-Description=Configure Velodyne network interface
-After=network-pre.target
-Wants=network-pre.target
-
-[Service]
-Type=oneshot
-ExecStart=/usr/local/bin/velodyne-net.sh
-RemainAfterExit=true
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-sudo systemctl daemon-reload
-sudo systemctl enable --now velodyne-net.service
-
-echo "Velodyne network configured on $IFACE with $HOST_IP (persistent)."
+echo "Velodyne network configured on $IFACE with $HOST_IP (persistent via NetworkManager)."
