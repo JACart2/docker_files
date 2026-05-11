@@ -176,6 +176,16 @@ text = text.replace(old_args, new_args, 1)
 text = text.replace(old_launch_args, new_launch_args, 1)
 text = text.replace(old_ld, new_ld, 1)
 path.write_text(text)
+
+cfg_path = Path('/opt/ros_ws/src/mmwave_ti_ros/ros2_driver/src/ti_mmwave_rospkg/cfg/6843AOP_Standard.cfg')
+cfg_text = cfg_path.read_text()
+old_clutter = 'clutterRemoval -1 1'
+new_clutter = 'clutterRemoval -1 0'
+
+if old_clutter not in cfg_text:
+    raise SystemExit('Unexpected upstream 6843AOP_Standard.cfg contents')
+
+cfg_path.write_text(cfg_text.replace(old_clutter, new_clutter, 1))
 INNER_PY
 
 
