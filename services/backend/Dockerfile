@@ -163,9 +163,9 @@ RUN set -eo pipefail; \
 #     && chmod +x src/ai-navigation/motor_control/resource/docker_startup_script.sh \
 #     && ./src/ai-navigation/motor_control/resource/docker_startup_script.sh
 
-# Get maps
+# Get maps and Calibration Files
 RUN mkdir -p /maps && \
-    wget -q -r -nd -l1 -A pcd -P /maps https://w3.cs.jmu.edu/spragunr/rosmaps/
+    wget -q -r -np -nd -l1 -P /maps -A "*.yaml,*.pcd" https://w3.cs.jmu.edu/spragunr/rosmaps/
 
 # Get student auth setup script
 RUN wget -O /root/student_auth_setup.sh https://raw.githubusercontent.com/JACart2/docker_files/main/student_auth_setup.sh && \
