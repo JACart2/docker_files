@@ -97,3 +97,49 @@ Once you open the container in vscode, opening a terminal (through VSCode) will 
 ## Manual Clean Up
 - `docker rm <Container id or name>`  :  Remove specified container
 - `docker rmi <Image id or name>`     :  Remove specified image
+
+---
+
+## Launching the cart with radar
+
+The fastest "I want the cart running" loop is the dev-backend script plus a launch line:
+
+```bash
+# 1. From the host (this repo's directory), bring up the backend in stalled
+#    mode and drop into a shell inside it. Frontend comes up normally on
+#    http://localhost:5173.
+./dev-run-backend.sh
+
+# 2. Inside the backend shell, launch the full autonomous stack with the
+#    cart's actual serial-port IDs (default ttyUSB0/ttyUSB1 don't match
+#    this hardware):
+ros2 launch cart_launch autonomous_launcher.launch.py \
+  motor_arduino_port:=/dev/serial/by-id/usb-FTDI_FT232R_USB_UART_BG00448R-if00-port0 \
+  radar_command_port:=/dev/serial/by-id/usb-Silicon_Labs_CP2105_Dual_USB_to_UART_Bridge_Controller_011D1A9D-if00-port0 \
+  radar_data_port:=/dev/serial/by-id/usb-Silicon_Labs_CP2105_Dual_USB_to_UART_Bridge_Controller_011D1A9D-if01-port0
+```
+
+This brings up everything in a single launch: TI mmWave radar driver, `radar_xyz_filter` (with Tk slider window), `radar_pcl_to_obstacles`, velodyne + lidar localization, navigation stack, motor endpoint, rosbridge, swri_console, and **two RViz windows** (top-down map view + radar-perspective view). See the [ai-navigation README](https://github.com/JACart2/ai-navigation) for what each radar node does and how to retune the filter.
+
+### What's in this repo for the radar setup
+
+* `compose.yaml` — has `BROWSER=none` in the frontend `environment:` so vite doesn't try to spawn `xdg-open` inside the browser-less container and crash on startup. The `ui` repo's `vite.config.ts` ships `server.open: true` (regression introduced upstream in `ui` commit `60b555b0`, 2025-02-11), so this env var is what keeps the frontend container alive. Don't remove it without also fixing the upstream config.
+* `services/backend/Dockerfile` — patches the TI radar's `6843AOP_Standard.cfg` at image-build time to set `clutterRemoval -1 0`, keeping short-range returns the radar would otherwise filter out.
+
+### `run.sh` quirk
+
+The "production" `./run.sh` runs the backend container with the compose default `command: ros2 launch cart_launch autonomous_launcher.launch.py` — which uses `/dev/ttyUSB0` / `/dev/ttyUSB1`, not the cart's by-id paths. If `run.sh` doesn't bring the hardware up, override the backend command for that run:
+
+```bash
+BACKEND_COMMAND="ros2 launch cart_launch autonomous_launcher.launch.py \
+  motor_arduino_port:=/dev/serial/by-id/usb-FTDI_FT232R_USB_UART_BG00448R-if00-port0 \
+  radar_command_port:=/dev/serial/by-id/usb-Silicon_Labs_CP2105_Dual_USB_to_UART_Bridge_Controller_011D1A9D-if00-port0 \
+  radar_data_port:=/dev/serial/by-id/usb-Silicon_Labs_CP2105_Dual_USB_to_UART_Bridge_Controller_011D1A9D-if01-port0" \
+  ./run.sh
+```
+
+`compose.yaml` already declares `BACKEND_COMMAND` as a pass-through env on the backend service, and `services/backend/entrypoint.sh` runs `bash -c "$BACKEND_COMMAND"` whenever it's set. No file edits needed for the one-off.
+
+---
+
+_It's been a long, successful semester. Good cart._
