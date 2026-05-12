@@ -1,8 +1,4 @@
 #!/bin/bash
-export OA_SECRET=$(cat /mnt/OA_SECRET.txt)
-
-echo "OA_SECRET loaded (length: ${#OA_SECRET})"
-
 source "/opt/ros/jazzy/setup.bash" --
 if [ -f "/root/dev_ws/install/setup.bash" ]; then
     source "/root/dev_ws/install/setup.bash" --

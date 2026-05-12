@@ -20,6 +20,7 @@ services:
       - $HOME/.Xauthority:/root/.Xauthority
       - /dev:/dev
       - zed_resources:/usr/local/zed/resources
+      - /usr/local/zed/settings:/usr/local/zed/settings
       - type: bind
         source: $HOME/dev_ws
         target: /root/dev_ws
@@ -54,15 +55,17 @@ services:
       - ROS_DOMAIN_ID=0
     volumes:
       - type: bind
-        source: $HOME/dev_ws/src/OA_SECRET.txt
-        target: /mnt/OA_SECRET.txt
-      - type: bind
         source: $HOME/dev_ws/
         target: /root/dev_ws/
       ## sourcing from /root/dev_ws fails to find this folder with existing install dir. This compensates for that. This dir exists in backend b/c it is built, but here we need to copy it over.
       - type: bind
         source: $HOME/dev_ws/
         target: /opt/ros_ws
+      ## this is the ollama cli container can use to serve and kill LLM instance
+      - type: bind 
+        source: /usr/local/bin/ollama
+        target: /usr/local/bin/ollama
+
     privileged: true
     runtime: nvidia
     network_mode: "host"
