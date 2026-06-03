@@ -1,12 +1,19 @@
 #!/bin/bash
 
-# -------------------------
 # Config (override via env)
-# -------------------------
 CART_NAME="${CART_NAME:-james}"
 SERVER_IP="${SERVER_IP:-10.247.225.41}"   # Dashboard server (external)
 CART_PORT="${CART_PORT:-9090}"
 API_PORT="${API_PORT:-8000}"
+
+#Termination signal to run.sh cleans all child processes
+cleanup() {
+  echo "Cleaning up..."
+  kill $COMPOSE_PID 2>/dev/null || true
+  kill %% 2>/dev/null || true  # Kill background jobs
+  exit 0
+}
+trap cleanup SIGINT SIGTERM EXIT
 
 # How often to *probe* the dashboard when it's down / between attempts
 REREGISTER_INTERVAL_SEC="${REREGISTER_INTERVAL_SEC:-15}"
