@@ -81,6 +81,7 @@ RUN set -eux; \
     ros-jazzy-rosbridge-server \
     ros-jazzy-tf-transformations \
     ros-jazzy-pointcloud-to-laserscan \
+    ros-jazzy-tf2-tools \
     python3-transforms3d \
     python3-networkx \
     python3-serial \
