@@ -65,11 +65,26 @@ RUN set -eux; \
     apt-get install -y --no-install-recommends \
       ${ROS_META_PKG} \
       ros-dev-tools \
+      python3-pip \
       python3-rosdep \
       python3-colcon-common-extensions \
       python3-vcstool \
+      python3-yaml \
       python3-empy \
+      libflann-dev \
+      liblz4-dev \
       build-essential \
+      ros-jazzy-ament-cmake \
+      ros-jazzy-ament-cmake-gtest \
+      ros-jazzy-gtsam \
+      ros-jazzy-mola \
+      ros-jazzy-mola-common \
+      ros-jazzy-mola-georeferencing \
+      ros-jazzy-mola-gtsam-factors \
+      ros-jazzy-mola-lidar-odometry \
+      ros-jazzy-mola-state-estimation \
+      ros-jazzy-mola-test-datasets \
+      ros-jazzy-mola-viz \
       git; \
     rm -rf /var/lib/apt/lists/*
 
@@ -79,7 +94,10 @@ RUN set -eux; \
 RUN set -eux; \
     apt-get update; \
     apt-get install -y ros-jazzy-velodyne \
+    ros-jazzy-velodyne-driver \
+    ros-jazzy-velodyne-pointcloud \
     ros-jazzy-rosbridge-server \
+    ros-jazzy-rviz2 \
     ros-jazzy-tf-transformations \
     ros-jazzy-pointcloud-to-laserscan \
     python3-transforms3d \
@@ -88,6 +106,7 @@ RUN set -eux; \
     python3-bitstruct \
     ros-jazzy-swri-console \
     xauth \
+    x11-xserver-utils \
     tmux \
     neovim \
     emacs 
@@ -176,14 +195,5 @@ COPY ./entrypoint.sh /entrypoint.sh
 RUN chmod 755 /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
-
-RUN set -eux; \
-    apt-get update; \
-    apt-get install -y \
-      ros-jazzy-mola \
-      ros-jazzy-mola-state-estimation \
-      ros-jazzy-mola-lidar-odometry \
-      ros-jazzy-mola-viz; \
-    rm -rf /var/lib/apt/lists/*
 
 WORKDIR ${ROS_WS}
