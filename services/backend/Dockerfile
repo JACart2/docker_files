@@ -109,9 +109,9 @@ RUN git clone https://github.com/rsasaki0109/ndt_omp_ros2.git
 RUN git clone --recursive --depth 1 --branch "${ZED_ROS2_WRAPPER_TAG}" https://github.com/stereolabs/zed-ros2-wrapper.git 
 RUN git clone https://github.com/stereolabs/zed-ros2-examples.git
 
-# This should be changed later when this repo has a new stable release, (i.e. a stable release after this date 6/15/26)
-ARG LIDAR_LOCALIZATION_COMMIT=64446b319a789799e7285905b98f38326ea39b9d
-RUN git clone https://github.com/rsasaki0109/lidar_localization_ros2.git && \
+# Pinned to jazzy branch HEAD; upstream main was force-pushed with unrelated research code
+ARG LIDAR_LOCALIZATION_COMMIT=7bf46778767b5544c345a0ef6676cc676c8e6130
+RUN git clone --branch jazzy https://github.com/rsasaki0109/lidar_localization_ros2.git && \
     cd lidar_localization_ros2 && \
     git checkout ${LIDAR_LOCALIZATION_COMMIT}
 WORKDIR ${ROS_WS}
