@@ -110,7 +110,7 @@ RUN git clone --recursive --depth 1 --branch "${ZED_ROS2_WRAPPER_TAG}" https://g
 RUN git clone https://github.com/stereolabs/zed-ros2-examples.git
 
 # This should be changed later when this repo has a new stable release, (i.e. a stable release after this date 6/15/26)
-ARG LIDAR_LOCALIZATION_COMMIT=ca80f9f4b201456fc5b9d74f171d6b449ca6a85c
+ARG LIDAR_LOCALIZATION_COMMIT=64446b319a789799e7285905b98f38326ea39b9d
 RUN git clone https://github.com/rsasaki0109/lidar_localization_ros2.git && \
     cd lidar_localization_ros2 && \
     git checkout ${LIDAR_LOCALIZATION_COMMIT}
