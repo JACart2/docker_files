@@ -11,7 +11,7 @@ if [ -d ".git" ]; then
 fi
 
 echo "Installing npm dependencies..."
-npm install
+npm ci --prefer-offline --no-audit
 
 if [[ -n "$FRONTEND_COMMAND" ]]; then
   exec bash -lc "$FRONTEND_COMMAND"

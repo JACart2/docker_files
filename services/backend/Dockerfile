@@ -81,6 +81,7 @@ RUN set -eux; \
     ros-jazzy-rosbridge-server \
     ros-jazzy-tf-transformations \
     ros-jazzy-pointcloud-to-laserscan \
+    ros-jazzy-tf2-tools \
     python3-transforms3d \
     python3-networkx \
     python3-serial \
@@ -104,11 +105,15 @@ RUN python3 -m pip uninstall --break-system-packages -y numpy
 WORKDIR ${ROS_WS}/src
 # needed for anomaly_msg type dependency
 RUN git clone https://github.com/JACart2/anomaly_detection.git
-RUN git clone https://github.com/rsasaki0109/lidar_localization_ros2.git
 RUN git clone https://github.com/rsasaki0109/ndt_omp_ros2.git
 RUN git clone --recursive --depth 1 --branch "${ZED_ROS2_WRAPPER_TAG}" https://github.com/stereolabs/zed-ros2-wrapper.git 
 RUN git clone https://github.com/stereolabs/zed-ros2-examples.git
 
+# Pinned to jazzy branch HEAD; upstream main was force-pushed with unrelated research code
+ARG LIDAR_LOCALIZATION_COMMIT=7bf46778767b5544c345a0ef6676cc676c8e6130
+RUN git clone --branch jazzy https://github.com/rsasaki0109/lidar_localization_ros2.git && \
+    cd lidar_localization_ros2 && \
+    git checkout ${LIDAR_LOCALIZATION_COMMIT}
 WORKDIR ${ROS_WS}
 
 
