@@ -10,7 +10,8 @@ services:
     command: ros2 launch cart_launch autonomous_launcher.launch.py #can be overriden with $BACKEND_COMMAND
     environment:
       - BACKEND_COMMAND #will override the default command above
-      - ROS_DOMAIN_ID=0
+      - CART_ID=${CART_ID:-james}
+      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
       - $HOME/.ssh:/root/.ssh
       - $HOME/.gitconfig:/root/.gitconfig
       - DISPLAY
@@ -52,7 +53,8 @@ services:
     command: ros2 run anomaly_detection anomaly_detection_node
     environment:
       - ANOMALY_DETECTION_COMMAND # allows for default command override from entrypoint.sh
-      - ROS_DOMAIN_ID=0
+      - CART_ID=${CART_ID:-james}
+      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
     volumes:
       - type: bind
         source: $HOME/dev_ws/

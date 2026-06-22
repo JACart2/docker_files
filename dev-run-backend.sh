@@ -1,10 +1,30 @@
 #!/bin/bash
+set -e
 
-# Config (override via env)
-CART_NAME="${CART_NAME:-james}"
+# Config (override via env / first arg)
+CART_NAME="${CART_NAME:-${1:-james}}"
 SERVER_IP="${SERVER_IP:-10.247.225.41}"   # Dashboard server (external)
 CART_PORT="${CART_PORT:-9090}"
 API_PORT="${API_PORT:-8000}"
+
+case "${CART_NAME,,}" in
+  james)
+    CART_NAME="james"
+    CART_ID="${CART_ID:-james}"
+    ROS_DOMAIN_ID="${ROS_DOMAIN_ID:-0}"
+    ;;
+  madison)
+    CART_NAME="madison"
+    CART_ID="${CART_ID:-madison}"
+    ROS_DOMAIN_ID="${ROS_DOMAIN_ID:-1}"
+    ;;
+  *)
+    echo "Unknown cart '${CART_NAME}'. Use 'james' or 'madison'."
+    exit 1
+    ;;
+esac
+
+export CART_NAME CART_ID ROS_DOMAIN_ID
 
 #Termination signal to run.sh cleans all child processes
 cleanup() {
@@ -81,9 +101,9 @@ BACKEND_COMMAND="tail -f /dev/null" docker compose up frontend backend -d --buil
 if command -v code &> /dev/null; then
     CONTAINER_ID=$(docker compose ps -q backend)
     if [ -n "$CONTAINER_ID" ]; then
-        CONTAINER_NAME=$(docker inspect --format '{{.Name}}' $CONTAINER_ID | sed 's/^\///')
+        CONTAINER_NAME=$(docker inspect --format '{{.Name}}' "$CONTAINER_ID" | sed 's/^\///')
         if [ -n "$CONTAINER_NAME" ]; then
-             HEX_NAME=$(printf "$CONTAINER_NAME" | od -A n -t x1 | tr -d ' \n')
+             HEX_NAME=$(printf '%s' "$CONTAINER_NAME" | od -A n -t x1 | tr -d ' \n')
              URI="vscode-remote://attached-container+${HEX_NAME}/root/dev_ws"
              echo "Opening VS Code attached to ${CONTAINER_NAME}..."
              code --folder-uri "$URI"
