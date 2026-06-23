@@ -35,6 +35,7 @@ services:
     command: npm run dev
     environment:
       - FRONTEND_COMMAND #will override the default command above
+      - VITE_CART_NAME=${VITE_CART_NAME}
       - VITE_DASHBOARD_API_ROOT=${VITE_DASHBOARD_API_ROOT}
       - $HOME/.gitconfig:/root/.gitconfig
     network_mode: "host"
