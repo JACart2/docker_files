@@ -13,12 +13,9 @@ export SERVER_IP
 export API_PORT
 export CART_PORT
 
-export VITE_CART_NAME="${CART_NAME}"
-export VITE_DASHBOARD_API_ROOT="http://${SERVER_IP}:${API_PORT}/api/"
-
 # Variables passed into the Vite frontend
 export VITE_CART_NAME="${CART_NAME}"
-export VITE_DASHBOARD_API_ROOT="http://${SERVER_IP}:${API_PORT}/api/"
+export VITE_DASHBOARD_API_ROOT="http://${SERVER_IP}:${API_PORT}/"
 
 #Termination signal to run.sh cleans all child processes
 cleanup() {
