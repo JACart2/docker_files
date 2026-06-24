@@ -73,6 +73,12 @@ RUN set -eux; \
 # Install Ollama server/CLI binary
 RUN curl -fsSL https://ollama.com/install.sh | sh
 
+# Download Mistral model into the image
+RUN ollama serve > /tmp/ollama.log 2>&1 & \
+    sleep 5 && \
+    ollama pull mistral && \
+    pkill ollama
+
 RUN echo "set -g history-limit 100000" >> /root/.tmux.conf && \
     echo "set -g mouse on" >> /root/.tmux.conf && \
     echo "set -g set-clipboard on" >> /root/.tmux.conf
