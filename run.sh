@@ -20,6 +20,25 @@ DASHBOARD_ROOT="${DASHBOARD_SCHEME}://${SERVER_IP}:${API_PORT}"
 export VITE_CART_NAME="${CART_NAME}"
 export VITE_DASHBOARD_API_ROOT="${DASHBOARD_ROOT}/"
 
+case "${CART_NAME,,}" in
+  james)
+    CART_NAME="james"
+    CART_ID="${CART_ID:-james}"
+    ROS_DOMAIN_ID="${ROS_DOMAIN_ID:-0}"
+    ;;
+  madison)
+    CART_NAME="madison"
+    CART_ID="${CART_ID:-madison}"
+    ROS_DOMAIN_ID="${ROS_DOMAIN_ID:-1}"
+    ;;
+  *)
+    echo "Unknown cart '${CART_NAME}'. Use 'james' or 'madison'."
+    exit 1
+    ;;
+esac
+
+export CART_NAME CART_ID ROS_DOMAIN_ID
+
 #Termination signal to run.sh cleans all child processes
 cleanup() {
   echo "Cleaning up..."
