@@ -1,21 +1,24 @@
 #!/bin/bash
 set -e
 
-
 # Config (override via env)
 CART_NAME="${CART_NAME:-james}"
-SERVER_IP="${SERVER_IP:-10.247.225.41}"   # Dashboard server (external)
+SERVER_IP="${SERVER_IP:-10.247.225.41}"   # Dashboard server
 CART_PORT="${CART_PORT:-9090}"
 API_PORT="${API_PORT:-8000}"
+DASHBOARD_SCHEME="${DASHBOARD_SCHEME:-https}"
 
 export CART_NAME
 export SERVER_IP
 export API_PORT
 export CART_PORT
+export DASHBOARD_SCHEME
+
+DASHBOARD_ROOT="${DASHBOARD_SCHEME}://${SERVER_IP}:${API_PORT}"
 
 # Variables passed into the Vite frontend
 export VITE_CART_NAME="${CART_NAME}"
-export VITE_DASHBOARD_API_ROOT="http://${SERVER_IP}:${API_PORT}/"
+export VITE_DASHBOARD_API_ROOT="${DASHBOARD_ROOT}/"
 
 #Termination signal to run.sh cleans all child processes
 cleanup() {
