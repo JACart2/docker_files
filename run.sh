@@ -1,11 +1,24 @@
 #!/bin/bash
 set -e
 
-# Config (override via env / first arg)
-CART_NAME="${CART_NAME:-${1:-james}}"
-SERVER_IP="${SERVER_IP:-10.247.225.41}"   # Dashboard server (external)
+# Config (override via env)
+CART_NAME="${CART_NAME:-james}"
+SERVER_IP="${SERVER_IP:-10.247.225.41}"   # Dashboard server
 CART_PORT="${CART_PORT:-9090}"
 API_PORT="${API_PORT:-8000}"
+DASHBOARD_SCHEME="${DASHBOARD_SCHEME:-https}"
+
+export CART_NAME
+export SERVER_IP
+export API_PORT
+export CART_PORT
+export DASHBOARD_SCHEME
+
+DASHBOARD_ROOT="${DASHBOARD_SCHEME}://${SERVER_IP}:${API_PORT}"
+
+# Variables passed into the Vite frontend
+export VITE_CART_NAME="${CART_NAME}"
+export VITE_DASHBOARD_API_ROOT="${DASHBOARD_ROOT}/"
 
 case "${CART_NAME,,}" in
   james)
@@ -49,13 +62,13 @@ wait_for_frontend () {
 }
 
 dashboard_up () {
-  # Only check, don't fail script if dashboard is unreachable
-  curl -fsS "http://${SERVER_IP}:${API_PORT}/" >/dev/null 2>&1
+  # -k allows self-signed HTTPS certificates
+  curl -k -fsS "${DASHBOARD_ROOT}/" >/dev/null 2>&1
 }
 
 register_cart () {
-  # Ignore failure, always return true
-  curl -fsS -X POST "http://${SERVER_IP}:${API_PORT}/api/vehicles/register" \
+  # -k allows self-signed HTTPS certificates
+  curl -k -fsS -X POST "${DASHBOARD_ROOT}/api/vehicles/register" \
     -H "Content-Type: application/json" \
     -d "{\"name\":\"${CART_NAME}\",\"port\":${CART_PORT}}" >/dev/null 2>&1 || true
 }
