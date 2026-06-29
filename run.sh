@@ -40,13 +40,13 @@ wait_for_frontend () {
 }
 
 dashboard_up () {
-  # Only check, don't fail script if dashboard is unreachable
-  curl -fsS "http://${SERVER_IP}:${API_PORT}/" >/dev/null 2>&1
+  # -k allows self-signed HTTPS certificates
+  curl -k -fsS "${DASHBOARD_ROOT}/" >/dev/null 2>&1
 }
 
 register_cart () {
-  # Ignore failure, always return true
-  curl -fsS -X POST "http://${SERVER_IP}:${API_PORT}/api/vehicles/register" \
+  # -k allows self-signed HTTPS certificates
+  curl -k -fsS -X POST "${DASHBOARD_ROOT}/api/vehicles/register" \
     -H "Content-Type: application/json" \
     -d "{\"name\":\"${CART_NAME}\",\"port\":${CART_PORT}}" >/dev/null 2>&1 || true
 }
