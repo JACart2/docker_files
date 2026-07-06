@@ -68,7 +68,7 @@ RUN set -eux; \
       xauth \
       tmux \
       neovim \
-      emacs; \
+      emacs \
       python3-yaml \
       python3-empy \
       libflann-dev \
