@@ -74,6 +74,11 @@ RUN set -eux; \
       libflann-dev \
       liblz4-dev \
       build-essential \
+      python3-yaml \
+      python3-empy \
+      libflann-dev \
+      liblz4-dev \
+      build-essential \
       ros-jazzy-ament-cmake \
       ros-jazzy-ament-cmake-gtest \
       ros-jazzy-gtsam \
