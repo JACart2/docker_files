@@ -10,7 +10,7 @@ ARG ROS_WS=/opt/ros_ws
 ENV LANG=en_US.UTF-8
 ENV LC_ALL=en_US.UTF-8
 
-RUN apt-get update && apt-get install -y wget curl
+RUN apt-get update && apt-get install -y wget
 
 RUN set -eux; \
     apt-get update; \
@@ -51,7 +51,6 @@ RUN set -eux; \
       python3-rosdep \
       python3-colcon-common-extensions \
       python3-vcstool \
-      python3-pip \
       build-essential \
       git \
       ros-jazzy-velodyne \
@@ -73,12 +72,6 @@ RUN set -eux; \
       python3-empy \
       libflann-dev \
       liblz4-dev \
-      build-essential \
-      python3-yaml \
-      python3-empy \
-      libflann-dev \
-      liblz4-dev \
-      build-essential \
       ros-jazzy-ament-cmake \
       ros-jazzy-ament-cmake-gtest \
       ros-jazzy-gtsam \
@@ -89,8 +82,7 @@ RUN set -eux; \
       ros-jazzy-mola-lidar-odometry \
       ros-jazzy-mola-state-estimation \
       ros-jazzy-mola-test-datasets \
-      ros-jazzy-mola-viz \
-      git; \
+      ros-jazzy-mola-viz; \
     rm -rf /var/lib/apt/lists/*
 
 # Install Ollama server/CLI binary
@@ -104,23 +96,12 @@ RUN ollama serve > /tmp/ollama.log 2>&1 & \
 
 RUN set -eux; \
     apt-get update; \
-    apt-get install -y ros-jazzy-velodyne \
-    ros-jazzy-velodyne-driver \
-    ros-jazzy-velodyne-pointcloud \
-    ros-jazzy-rosbridge-server \
-    ros-jazzy-rviz2 \
-    ros-jazzy-tf-transformations \
-    ros-jazzy-pointcloud-to-laserscan \
-    python3-transforms3d \
-    python3-networkx \
-    python3-serial \
-    python3-bitstruct \
-    ros-jazzy-swri-console \
-    xauth \
-    x11-xserver-utils \
-    tmux \
-    neovim \
-    emacs 
+    apt-get install -y --no-install-recommends \
+      ros-jazzy-velodyne-driver \
+      ros-jazzy-velodyne-pointcloud \
+      ros-jazzy-rviz2 \
+      x11-xserver-utils; \
+    rm -rf /var/lib/apt/lists/*
 
 # Configure tmux
 RUN echo "set -g history-limit 100000" >> /root/.tmux.conf && \
@@ -140,6 +121,7 @@ RUN git clone --recursive --depth 1 --branch "${ZED_ROS2_WRAPPER_TAG}" https://g
 RUN git clone https://github.com/stereolabs/zed-ros2-examples.git
 RUN git clone https://github.com/rsasaki0109/lidar_localization_ros2.git
 
+# Used for mapping and loop closure. This is a fork of the original MOLA repo with some modifications to make it work with ROS2.
 RUN git clone https://github.com/MOLAorg/mola_sm_loop_closure.git src/mola_sm_loop_closure
 RUN git -C src/mola_sm_loop_closure submodule update --init --recursive
 
