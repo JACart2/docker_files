@@ -1,8 +1,7 @@
 #!/bin/bash
+set -e
 
 bash ./initialize_host.sh
-
-
 
 
 open_browser_when_ready() {
@@ -31,13 +30,24 @@ else
 fi
 
 
-STALL="tail -f /dev/null"
-MADISON_CONFIG="cd ~/dev_ws && ros2 launch cart_launch autonomous_launcher.launch.py cart_config_path:=./src/ai-navigation/cart_control/cart_launch/config/cart_madison.yaml"
-JAMES_CONFIG="cd ~/dev_ws && ros2 launch cart_launch autonomous_launcher.launch.py "
+ANOMALY_PACKAGE_PATHS="src/anomaly_detection/anomaly_msg src/anomaly_detection/anomaly_detection src/anomaly_detection/tester"
+ANOMALY_BUILD_AND_SOURCE="cd ~/dev_ws && colcon build --symlink-install --base-paths ${ANOMALY_PACKAGE_PATHS} && source install/setup.bash"
+ANOMALY_DETECTION_NODE="${ANOMALY_BUILD_AND_SOURCE} && ros2 run anomaly_detection anomaly_detection_node"
+ANOMALY_DETECTION_LAUNCH="${ANOMALY_BUILD_AND_SOURCE} && ros2 launch anomaly_detection anomaly_detection.launch.py"
+ANOMALY_MODE="${ANOMALY_MODE:-launch}"
 
-ANOMALY_LAUNCH="cd ~/dev_ws && ros2 launch anomaly_detection anomaly_detection.launch.py "
+if [ "$ANOMALY_MODE" = "node" ]; then
+    ANOMALY_COMMAND="$ANOMALY_DETECTION_NODE"
+else
+    ANOMALY_COMMAND="$ANOMALY_DETECTION_LAUNCH"
+fi
 
-ANOMALY_DETECTION_COMMAND=$ANOMALY_LAUNCH  BACKEND_COMMAND=$MADISON_CONFIG docker compose up $COMPOSE_FLAGS
+BACKEND_ROS_DOMAIN_ID="$(docker compose exec -T backend printenv ROS_DOMAIN_ID 2>/dev/null || true)"
+export ROS_DOMAIN_ID="${BACKEND_ROS_DOMAIN_ID:-${ROS_DOMAIN_ID:-0}}"
+echo "Using ROS_DOMAIN_ID=${ROS_DOMAIN_ID} for anomaly_detection"
+echo "Using anomaly command: ${ANOMALY_COMMAND}"
+
+ANOMALY_DETECTION_COMMAND="$ANOMALY_COMMAND" docker compose up -d $COMPOSE_FLAGS anomaly_detection
 
 # Launch VS Code attached to the container
 if command -v code &> /dev/null; then
@@ -54,7 +64,7 @@ if command -v code &> /dev/null; then
 fi
 
 # Attach a terminal to the anomaly_detection
-open_browser_when_ready 5173 & open_browser_when_ready 5000 & docker compose exec -it -w /root/dev_ws anomaly_detection bash -c 'source /opt/ros/jazzy/setup.bash && source /opt/ros_ws/install/setup.bash && ([ -f /root/dev_ws/install/setup.bash ] && source /root/dev_ws/install/setup.bash); exec bash'
-
-
-
+if [ "$ANOMALY_MODE" != "node" ]; then
+    open_browser_when_ready 5000 &
+fi
+docker compose exec -it -w /root/dev_ws anomaly_detection bash -c 'source /opt/ros/jazzy/setup.bash && source /opt/ros_ws/install/setup.bash && ([ -f /root/dev_ws/install/setup.bash ] && source /root/dev_ws/install/setup.bash); exec bash'

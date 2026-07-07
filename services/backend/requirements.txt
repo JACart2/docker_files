@@ -1,10 +1,7 @@
 ## active
 pyyaml
-openai
 pydantic
 numpy==1.26.4
-litellm
-ollama
 flask
 flask-socketio
 eventlet

@@ -8,6 +8,10 @@ if [ -f "/root/dev_ws/install/setup.bash" ]; then
     source "/root/dev_ws/install/setup.bash" --
 fi
 
+if [ -L "/root/dev_ws/src/anomaly_msg" ] && [ "$(readlink /root/dev_ws/src/anomaly_msg)" = "/opt/ros_ws/src/anomaly_msg" ]; then
+    rm "/root/dev_ws/src/anomaly_msg"
+fi
+
 echo 'source "/opt/ros/jazzy/setup.bash"' >> ~/.bashrc 
 echo 'source "/opt/ros_ws/install/setup.bash"' >> ~/.bashrc 
 echo 'if [ -f "/root/dev_ws/install/setup.bash" ]; then source "/root/dev_ws/install/setup.bash"; fi' >> ~/.bashrc 
@@ -18,4 +22,3 @@ if [[ -z "$BACKEND_COMMAND" ]]; then
 else
   bash -c "$BACKEND_COMMAND"
 fi
-

@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.7
 # Use the specified base image
 FROM osrf/ros:jazzy-desktop
 
@@ -7,7 +8,7 @@ SHELL ["/bin/bash", "-lc"]
 # Set environment variables to ensure correct behavior for installation and system setup
 ENV DEBIAN_FRONTEND=noninteractive
 ARG ROS_WS=/opt/ros_ws
-ARG ANOMALY_DETECTION_REF=901fdabd808629c17a11f5b700a6f16e798f87e7
+ARG ANOMALY_DETECTION_REF=main
 
 # nvidia-container-runtime & serial_number for cam
 ENV NVIDIA_VISIBLE_DEVICES=all
@@ -39,11 +40,24 @@ RUN set -eux; \
 # Install the Ollama server/CLI used by the anomaly detection node.
 RUN curl -fsSL https://ollama.com/install.sh | sh
 
-# Download Mistral model into the image
-RUN ollama serve > /tmp/ollama.log 2>&1 & \
-    sleep 5 && \
-    ollama pull mistral && \
-    pkill ollama
+# Download Mistral through a BuildKit cache, then copy it into the image.
+RUN --mount=type=cache,target=/tmp/ollama-cache \
+    set -eux; \
+    export OLLAMA_MODELS=/tmp/ollama-cache/models; \
+    ollama serve > /tmp/ollama.log 2>&1 & \
+    ollama_pid="$!"; \
+    for i in {1..30}; do \
+        if ollama list >/dev/null 2>&1; then \
+            break; \
+        fi; \
+        sleep 1; \
+    done; \
+    ollama pull mistral; \
+    mkdir -p /root/.ollama; \
+    rm -rf /root/.ollama/models; \
+    cp -a /tmp/ollama-cache/models /root/.ollama/models; \
+    kill "$ollama_pid"; \
+    wait "$ollama_pid" || true
         
 
 # Configure tmux
@@ -65,7 +79,7 @@ RUN pip3 install --no-cache-dir --break-system-packages --ignore-installed -r /t
 WORKDIR ${ROS_WS}/src
 
 RUN git clone https://github.com/JACart2/anomaly_detection.git && \
-    git -C anomaly_detection checkout --detach "${ANOMALY_DETECTION_REF}" && \
+    git -C anomaly_detection checkout "${ANOMALY_DETECTION_REF}" && \
     sed -i 's/<depend>built_interfaces<\/depend>/<depend>builtin_interfaces<\/depend>/' \
         anomaly_detection/anomaly_msg/package.xml
 
