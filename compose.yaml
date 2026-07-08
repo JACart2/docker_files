@@ -53,8 +53,8 @@ services:
       - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
     volumes:
       - type: bind
-        source: $HOME/dev_ws/src/anomaly_detection
-        target: /root/dev_ws/src/anomaly_detection
+        source: $HOME/dev_ws
+        target: /root/dev_ws
     privileged: true
     runtime: nvidia
     network_mode: "host"

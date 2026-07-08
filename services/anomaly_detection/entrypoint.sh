@@ -13,10 +13,6 @@ grep -qxF 'if [ -f "/opt/ros_ws/install/setup.bash" ]; then source "/opt/ros_ws/
 grep -qxF 'if [ -f "/root/dev_ws/install/setup.bash" ]; then source "/root/dev_ws/install/setup.bash"; fi' ~/.bashrc || \
     echo 'if [ -f "/root/dev_ws/install/setup.bash" ]; then source "/root/dev_ws/install/setup.bash"; fi' >> ~/.bashrc
 
-if [ ! -e "/root/dev_ws/src/anomaly_detection" ] && [ -d "/opt/ros_ws/src/anomaly_detection" ]; then
-    mkdir -p "/root/dev_ws/src"
-    cp -a "/opt/ros_ws/src/anomaly_detection" "/root/dev_ws/src/anomaly_detection"
-fi
 if [ -e "/root/dev_ws/src/anomaly_detection/COLCON_IGNORE" ]; then
     rm -f "/root/dev_ws/src/anomaly_detection/COLCON_IGNORE"
 fi

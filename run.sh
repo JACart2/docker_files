@@ -61,7 +61,7 @@ reregister_loop () {
 }
 
 # Start containers
-docker compose up backend frontend --build --remove-orphans --force-recreate &
+docker compose up backend frontend anomaly_detection --build --remove-orphans --force-recreate &
 COMPOSE_PID=$!
 
 # Wait for frontend then open browser
