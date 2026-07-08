@@ -69,7 +69,6 @@ RUN set -eux; \
       emacs \
       python3-yaml \
       python3-empy \
-      libflann-dev \
       liblz4-dev \
       libyaml-cpp-dev \
       libudev-dev \
@@ -108,10 +107,8 @@ RUN git clone --filter=blob:none --no-checkout https://github.com/JACart2/anomal
     sed -i 's/<depend>built_interfaces<\/depend>/<depend>builtin_interfaces<\/depend>/' \
       anomaly_msg/package.xml && \
     rm -rf /tmp/anomaly_detection
-RUN git clone https://github.com/rsasaki0109/ndt_omp_ros2.git
 RUN git clone --recursive --depth 1 --branch "${ZED_ROS2_WRAPPER_TAG}" https://github.com/stereolabs/zed-ros2-wrapper.git
 RUN git clone https://github.com/stereolabs/zed-ros2-examples.git
-RUN git clone https://github.com/rsasaki0109/lidar_localization_ros2.git
 
 # Used for mapping and loop closure. This is a fork of the original MOLA repo with some modifications to make it work with ROS2.
 RUN git clone https://github.com/MOLAorg/mola_sm_loop_closure.git src/mola_sm_loop_closure
