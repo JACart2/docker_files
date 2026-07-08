@@ -98,10 +98,6 @@ RUN echo "set -g history-limit 100000" >> /root/.tmux.conf && \
 
 RUN python3 -m pip uninstall --break-system-packages -y numpy || true
 
-COPY requirements.txt /tmp/backend_requirements.txt
-RUN --mount=type=cache,target=/root/.cache/pip \
-    python3 -m pip install --break-system-packages --ignore-installed -r /tmp/backend_requirements.txt
-
 WORKDIR ${ROS_WS}/src
 
 RUN git clone --filter=blob:none --no-checkout https://github.com/JACart2/anomaly_detection.git /tmp/anomaly_detection && \
