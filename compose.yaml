@@ -10,6 +10,7 @@ services:
     command: ros2 launch cart_launch autonomous_launcher.launch.py #can be overriden with $BACKEND_COMMAND
     environment:
       - BACKEND_COMMAND #will override the default command above
+      - CART_ID=${CART_ID:-james}
       - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
       - $HOME/.ssh:/root/.ssh
       - $HOME/.gitconfig:/root/.gitconfig
@@ -35,6 +36,8 @@ services:
     command: npm run dev
     environment:
       - FRONTEND_COMMAND #will override the default command above
+      - VITE_CART_NAME=${VITE_CART_NAME}
+      - VITE_DASHBOARD_API_ROOT=${VITE_DASHBOARD_API_ROOT}
       - $HOME/.gitconfig:/root/.gitconfig
     network_mode: "host"
     volumes:
@@ -50,6 +53,7 @@ services:
     command: ros2 run anomaly_detection anomaly_detection_node
     environment:
       - ANOMALY_DETECTION_COMMAND # allows for default command override from entrypoint.sh
+      - CART_ID=${CART_ID:-james}
       - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
     volumes:
       - type: bind
