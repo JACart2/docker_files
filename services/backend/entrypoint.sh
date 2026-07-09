@@ -18,4 +18,3 @@ if [[ -z "$BACKEND_COMMAND" ]]; then
 else
   bash -c "$BACKEND_COMMAND"
 fi
-

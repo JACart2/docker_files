@@ -1,24 +1,26 @@
+# syntax=docker/dockerfile:1.7
 # Use the specified base image
-FROM osrf/ros:jazzy-desktop 
+FROM osrf/ros:jazzy-desktop
 
 # needed for ros setup script on build
 SHELL ["/bin/bash", "-lc"]
 
 # Set environment variables to ensure correct behavior for installation and system setup
 ENV DEBIAN_FRONTEND=noninteractive
-# Choose: ros-jazzy-ros-base (headless) or ros-jazzy-desktop (RViz etc.)
-ARG ROS_META_PKG=ros-jazzy-desktop
+ARG ROS_WS=/opt/ros_ws
+ARG ANOMALY_DETECTION_REF=main
 
 # nvidia-container-runtime & serial_number for cam
-ENV NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES:-all}
-ENV NVIDIA_DRIVER_CAPABILITIES=${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics,compute,video,utility
+ENV NVIDIA_VISIBLE_DEVICES=all
+ENV NVIDIA_DRIVER_CAPABILITIES=graphics,compute,video,utility
 
 # general packages
 RUN set -eux; \
     apt-get update; \
     apt-get install -y --no-install-recommends \
         python3-pip python3-dev python3-setuptools python3-tk \
-        build-essential cmake git \
+        python3-rosdep python3-colcon-common-extensions \
+        build-essential cmake git curl ca-certificates zstd \
         libgl1 libglib2.0-0 \
         ros-jazzy-velodyne \
         ros-jazzy-rosbridge-server \
@@ -34,6 +36,28 @@ RUN set -eux; \
         neovim \
         emacs; \
     rm -rf /var/lib/apt/lists/*
+
+# Install the Ollama server/CLI used by the anomaly detection node.
+RUN curl -fsSL https://ollama.com/install.sh | sh
+
+# Download Mistral through a BuildKit cache, then copy it into the image.
+RUN --mount=type=cache,target=/tmp/ollama-cache \
+    set -eux; \
+    export OLLAMA_MODELS=/tmp/ollama-cache/models; \
+    ollama serve > /tmp/ollama.log 2>&1 & \
+    ollama_pid="$!"; \
+    for i in {1..30}; do \
+        if ollama list >/dev/null 2>&1; then \
+            break; \
+        fi; \
+        sleep 1; \
+    done; \
+    ollama pull mistral; \
+    mkdir -p /root/.ollama; \
+    rm -rf /root/.ollama/models; \
+    cp -a /tmp/ollama-cache/models /root/.ollama/models; \
+    kill "$ollama_pid"; \
+    wait "$ollama_pid" || true
         
 
 # Configure tmux
@@ -51,8 +75,29 @@ RUN pip3 install  --break-system-packages --no-cache-dir numpy==1.26.4
 COPY ./requirements.txt /tmp/requirements.txt
 RUN pip3 install --no-cache-dir --break-system-packages --ignore-installed -r /tmp/requirements.txt
 
-## this should be the root of anomaly_detection, 
-WORKDIR /root/dev_ws/src/anomaly_detection
+## Pulling in the anomaly_detection repo into the dev workspace
+WORKDIR ${ROS_WS}/src
+
+RUN git clone https://github.com/JACart2/anomaly_detection.git && \
+    git -C anomaly_detection checkout "${ANOMALY_DETECTION_REF}" && \
+    sed -i 's/<depend>built_interfaces<\/depend>/<depend>builtin_interfaces<\/depend>/' \
+        anomaly_detection/anomaly_msg/package.xml
+
+WORKDIR ${ROS_WS}
+
+RUN set -ex; \
+    if [ ! -f /etc/ros/rosdep/sources.list.d/20-default.list ]; then \
+        rosdep init; \
+    fi; \
+    rosdep update; \
+    apt-get update; \
+    rosdep install --from-paths src --ignore-src --skip-keys ament_python -r -y; \
+    source /opt/ros/jazzy/setup.bash; \
+    colcon build \
+        --symlink-install \
+        --event-handlers console_direct+ \
+        --cmake-args -DCMAKE_BUILD_TYPE=Release; \
+    rm -rf /var/lib/apt/lists/*
 
 # # initialize entrypoint, this gets access to the secret on the machine
 COPY ./entrypoint.sh /entrypoint.sh

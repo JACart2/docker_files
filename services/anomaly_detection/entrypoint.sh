@@ -1,5 +1,8 @@
 #!/bin/bash
 source "/opt/ros/jazzy/setup.bash" --
+if [ -f "/opt/ros_ws/install/setup.bash" ]; then
+    source "/opt/ros_ws/install/setup.bash" --
+fi
 if [ -f "/root/dev_ws/install/setup.bash" ]; then
     source "/root/dev_ws/install/setup.bash" --
 fi
@@ -11,4 +14,3 @@ if [[ -z "$ANOMALY_DETECTION_COMMAND" ]]; then
 else
   exec bash -lc "$ANOMALY_DETECTION_COMMAND"
 fi
-
