@@ -99,6 +99,19 @@ RUN set -ex; \
         --cmake-args -DCMAKE_BUILD_TYPE=Release; \
     rm -rf /var/lib/apt/lists/*
 
+# Fail the build if either the ROS installation or the image workspace setup is
+# missing. Source both automatically in interactive shells (for example, shells
+# opened through VS Code or `docker compose exec`). The host-mounted dev_ws is
+# optional and is sourced only after it has been built.
+RUN set -eux; \
+    test -f /opt/ros/jazzy/setup.bash; \
+    test -f "${ROS_WS}/install/setup.bash"; \
+    printf '%s\n' \
+        'source /opt/ros/jazzy/setup.bash' \
+        'source /opt/ros_ws/install/setup.bash' \
+        'if [ -f /root/dev_ws/install/setup.bash ]; then source /root/dev_ws/install/setup.bash; fi' \
+        >> /root/.bashrc
+
 # # initialize entrypoint, this gets access to the secret on the machine
 COPY ./entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
