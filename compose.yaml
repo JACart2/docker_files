@@ -43,7 +43,7 @@ services:
     volumes:
       - $HOME/.ssh:/root/.ssh
       - type: bind
-        source: $HOME/ui
+        source: $HOME/dev_ws/src/ui
         target: /root/ui
       - ui:/root/ui/node_modules
   anomaly_detection:
