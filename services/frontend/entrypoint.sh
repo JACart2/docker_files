@@ -4,6 +4,8 @@ set -e
 # Match docker-compose working_dir
 cd /root/ui
 
+git config --global --add safe.directory /root/ui
+
 # Optional: update if it's a git repo
 if [ -d ".git" ]; then
   echo "Updating UI from GitHub..."
