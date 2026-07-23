@@ -52,6 +52,7 @@ services:
       dockerfile: ./Dockerfile
     command: ros2 run anomaly_detection anomaly_detection_node
     environment:
+      - ANOMALY_AUTOSTART=${ANOMALY_AUTOSTART:-true}
       - ANOMALY_DETECTION_COMMAND # allows for default command override from entrypoint.sh
       - CART_ID=${CART_ID:-james}
       - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}

@@ -9,6 +9,7 @@ set -euo pipefail
 #   CART_NAME=mycart ROS_DOMAIN_ID=7 ./dev-run-anomaly-detection.sh
 #
 # Optional:
+#   ANOMALY_AUTOSTART=true ./dev-run-anomaly-detection.sh
 #   ANOMALY_MODE=node ./dev-run-anomaly-detection.sh
 #   ANOMALY_MODE=launch ./dev-run-anomaly-detection.sh
 #
@@ -263,6 +264,8 @@ fi
 # Anomaly detection command
 ###############################################################################
 
+ANOMALY_AUTOSTART="${ANOMALY_AUTOSTART:-false}"
+
 ANOMALY_PACKAGE_PATHS=(
   "src/anomaly_detection/anomaly_msg"
   "src/anomaly_detection/anomaly_detection"
@@ -288,25 +291,43 @@ ros2 launch anomaly_detection anomaly_detection.launch.py"
 
 ANOMALY_MODE="${ANOMALY_MODE:-launch}"
 
-case "$ANOMALY_MODE" in
-  node)
-    ANOMALY_COMMAND="$ANOMALY_DETECTION_NODE"
+case "$ANOMALY_AUTOSTART" in
+  true)
+    case "$ANOMALY_MODE" in
+      node)
+        ANOMALY_COMMAND="$ANOMALY_DETECTION_NODE"
+        ;;
+      launch)
+        ANOMALY_COMMAND="$ANOMALY_DETECTION_LAUNCH"
+        ;;
+      *)
+        echo "Invalid ANOMALY_MODE '${ANOMALY_MODE}'."
+        echo "Valid values are 'node' and 'launch'."
+        exit 1
+        ;;
+    esac
     ;;
-  launch)
-    ANOMALY_COMMAND="$ANOMALY_DETECTION_LAUNCH"
+  false)
+    ANOMALY_COMMAND=""
     ;;
   *)
-    echo "Invalid ANOMALY_MODE '${ANOMALY_MODE}'."
-    echo "Valid values are 'node' and 'launch'."
+    echo "Invalid ANOMALY_AUTOSTART '${ANOMALY_AUTOSTART}'."
+    echo "Valid values are 'true' and 'false'."
     exit 1
     ;;
 esac
 
+export ANOMALY_AUTOSTART
 export ANOMALY_MODE
 export ANOMALY_DETECTION_COMMAND="$ANOMALY_COMMAND"
 
+echo "  ANOMALY_AUTOSTART=${ANOMALY_AUTOSTART}"
 echo "  ANOMALY_MODE=${ANOMALY_MODE}"
-echo "  ANOMALY_COMMAND=${ANOMALY_COMMAND}"
+if [ "$ANOMALY_AUTOSTART" = "true" ]; then
+  echo "  ANOMALY_COMMAND=${ANOMALY_COMMAND}"
+else
+  echo "  ANOMALY_COMMAND=disabled (run commands manually in the container)"
+fi
 
 ###############################################################################
 # Start anomaly detection
@@ -317,7 +338,7 @@ docker compose up \
   "${COMPOSE_FLAGS[@]}" \
   anomaly_detection
 
-if [ "$ANOMALY_MODE" = "launch" ]; then
+if [ "$ANOMALY_AUTOSTART" = "true" ] && [ "$ANOMALY_MODE" = "launch" ]; then
   open_browser_when_ready 5000 &
   BROWSER_PID=$!
 fi

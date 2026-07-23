@@ -7,6 +7,11 @@ if [ -f "/root/dev_ws/install/setup.bash" ]; then
     source "/root/dev_ws/install/setup.bash" --
 fi
 
+if [[ "${ANOMALY_AUTOSTART:-true}" != "true" ]]; then
+  echo "Anomaly detection autostart is disabled; container is ready for manual commands."
+  exec tail -f /dev/null
+fi
+
 if [[ -n "${ROS_BAG_PATH:-}" ]]; then
   if [[ ! -e "$ROS_BAG_PATH" ]]; then
     echo "Configured ROS bag does not exist: $ROS_BAG_PATH" >&2
