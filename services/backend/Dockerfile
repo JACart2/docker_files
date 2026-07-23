@@ -69,6 +69,27 @@ RUN set -eux; \
       python3-colcon-common-extensions \
       python3-vcstool \
       build-essential \
+      libeigen3-dev \
+      libflann-dev \
+      libgeographiclib-dev \
+      liblz4-dev \
+      libproj-dev \
+      libtbb-dev \
+      proj-data \
+      ros-jazzy-gtsam \
+      ros-jazzy-mola \
+      ros-jazzy-mola-common \
+      ros-jazzy-mola-georeferencing \
+      ros-jazzy-mola-gtsam-factors \
+      ros-jazzy-mola-input-rosbag2 \
+      ros-jazzy-mola-lidar-odometry \
+      ros-jazzy-mola-metric-maps \
+      ros-jazzy-mola-pose-list \
+      ros-jazzy-mola-relocalization \
+      ros-jazzy-mola-state-estimation-simple \
+      ros-jazzy-mola-yaml \
+      ros-jazzy-mp2p-icp \
+      ros-jazzy-rosbag2-storage-mcap \
       git; \
     rm -rf /var/lib/apt/lists/*
 
@@ -108,6 +129,14 @@ RUN git clone https://github.com/JACart2/anomaly_detection.git
 RUN git clone https://github.com/rsasaki0109/ndt_omp_ros2.git
 RUN git clone --recursive --depth 1 --branch "${ZED_ROS2_WRAPPER_TAG}" https://github.com/stereolabs/zed-ros2-wrapper.git 
 RUN git clone https://github.com/stereolabs/zed-ros2-examples.git
+
+# KISS-Matcher and ROBIN are submodules of mola_sm_loop_closure.
+# Pin the validated upstream revision so Docker builds remain reproducible.
+ARG MOLA_SM_LOOP_CLOSURE_COMMIT=cc6f30fdc2acb98315c0a10048d2fd40ccc55011
+RUN git clone --recursive https://github.com/MOLAorg/mola_sm_loop_closure.git && \
+    cd mola_sm_loop_closure && \
+    git checkout "${MOLA_SM_LOOP_CLOSURE_COMMIT}" && \
+    git submodule update --init --recursive
 
 # Pinned to jazzy branch HEAD; upstream main was force-pushed with unrelated research code
 ARG LIDAR_LOCALIZATION_COMMIT=7bf46778767b5544c345a0ef6676cc676c8e6130
