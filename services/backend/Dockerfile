@@ -69,7 +69,13 @@ RUN set -eux; \
       emacs \
       python3-yaml \
       python3-empy \
+      libeigen3-dev \
+      libflann-dev \
+      libgeographiclib-dev \
       liblz4-dev \
+      libproj-dev \
+      libtbb-dev \
+      proj-data \
       libyaml-cpp-dev \
       libudev-dev \
       ros-jazzy-ament-cmake \
@@ -79,10 +85,18 @@ RUN set -eux; \
       ros-jazzy-mola-common \
       ros-jazzy-mola-georeferencing \
       ros-jazzy-mola-gtsam-factors \
+      ros-jazzy-mola-input-rosbag2 \
       ros-jazzy-mola-lidar-odometry \
+      ros-jazzy-mola-metric-maps \
+      ros-jazzy-mola-pose-list \
+      ros-jazzy-mola-relocalization \
       ros-jazzy-mola-state-estimation \
+      ros-jazzy-mola-state-estimation-simple \
       ros-jazzy-mola-test-datasets \
       ros-jazzy-mola-viz \
+      ros-jazzy-mola-yaml \
+      ros-jazzy-mp2p-icp \
+      ros-jazzy-rosbag2-storage-mcap \
       ros-jazzy-velodyne-driver \
       ros-jazzy-velodyne-pointcloud \
       ros-jazzy-rviz2 \
@@ -111,8 +125,13 @@ RUN git clone --recursive --depth 1 --branch "${ZED_ROS2_WRAPPER_TAG}" https://g
 RUN git clone https://github.com/stereolabs/zed-ros2-examples.git
 
 # Used for mapping and loop closure. This is a fork of the original MOLA repo with some modifications to make it work with ROS2.
+WORKDIR ${ROS_WS}
 RUN git clone https://github.com/MOLAorg/mola_sm_loop_closure.git src/mola_sm_loop_closure
 RUN git -C src/mola_sm_loop_closure submodule update --init --recursive
+
+WORKDIR ${ROS_WS}/src
+RUN git clone https://github.com/rsasaki0109/ndt_omp_ros2.git
+RUN git clone --branch jazzy https://github.com/rsasaki0109/lidar_localization_ros2.git
 
 
 # ============================================================================
