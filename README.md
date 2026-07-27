@@ -36,10 +36,17 @@ Docker setup for running the JACart software stack using **ROS 2 Jazzy** on **Ub
 
 ## Usage
 
-### Production / Full Run
-To start the full system (Backend ROS nodes + Frontend UI):
+### Production / Cart Run
+To start the cart stack and frontend UI with anomaly logging and rosbridge, but
+without the LLM-backed anomaly detection service:
 ```bash
 ./run.sh
+```
+
+To opt into the full anomaly detection/LLM service as well:
+
+```bash
+ENABLE_ANOMALY_DETECTION=true ./run.sh
 ```
 
 ### Development
