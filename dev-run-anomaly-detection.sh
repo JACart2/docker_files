@@ -17,83 +17,10 @@ set -euo pipefail
 #   SERVER_IP=10.247.225.41 API_PORT=8000 ./dev-run-anomaly-detection.sh
 #   DASHBOARD_SCHEME=http ./dev-run-anomaly-detection.sh
 
-###############################################################################
-# Cart and dashboard configuration
-###############################################################################
+source ./dashboard-api.sh
 
-CART_NAME="${CART_NAME:-${1:-james}}"
-CLI_ROS_DOMAIN_ID="${2:-}"
-
-SERVER_IP="${SERVER_IP:-10.247.225.41}"
-CART_PORT="${CART_PORT:-9090}"
-API_PORT="${API_PORT:-8000}"
-DASHBOARD_SCHEME="${DASHBOARD_SCHEME:-https}"
-
-CART_NAME_LOWER="$(
-  printf '%s' "$CART_NAME" |
-    tr '[:upper:]' '[:lower:]'
-)"
-
-# ROS_DOMAIN_ID priority:
-#   1. Existing ROS_DOMAIN_ID environment variable
-#   2. Second command-line argument
-#   3. Known cart default
-#   4. Domain 0 fallback
-if [ -n "${ROS_DOMAIN_ID:-}" ]; then
-  ROS_DOMAIN_ID="${ROS_DOMAIN_ID}"
-elif [ -n "$CLI_ROS_DOMAIN_ID" ]; then
-  ROS_DOMAIN_ID="$CLI_ROS_DOMAIN_ID"
-else
-  case "$CART_NAME_LOWER" in
-    james)
-      ROS_DOMAIN_ID="0"
-      ;;
-    madison)
-      ROS_DOMAIN_ID="1"
-      ;;
-    *)
-      ROS_DOMAIN_ID="0"
-      ;;
-  esac
-fi
-
-if ! [[ "$ROS_DOMAIN_ID" =~ ^[0-9]+$ ]]; then
-  echo "Invalid ROS_DOMAIN_ID '${ROS_DOMAIN_ID}'. It must be a number."
-  exit 1
-fi
-
-if (( ROS_DOMAIN_ID < 0 || ROS_DOMAIN_ID > 232 )); then
-  echo "Invalid ROS_DOMAIN_ID '${ROS_DOMAIN_ID}'. Use a value between 0 and 232."
-  exit 1
-fi
-
-if ! [[ "$CART_PORT" =~ ^[0-9]+$ ]]; then
-  echo "Invalid CART_PORT '${CART_PORT}'. It must be a number."
-  exit 1
-fi
-
-if ! [[ "$API_PORT" =~ ^[0-9]+$ ]]; then
-  echo "Invalid API_PORT '${API_PORT}'. It must be a number."
-  exit 1
-fi
-
-CART_ID="${CART_ID:-$CART_NAME}"
-
-DASHBOARD_ROOT="${DASHBOARD_SCHEME}://${SERVER_IP}:${API_PORT}"
-
-export CART_NAME
-export CART_ID
-export ROS_DOMAIN_ID
-export SERVER_IP
-export CART_PORT
-export API_PORT
-export DASHBOARD_SCHEME
-export DASHBOARD_ROOT
-
-# Used by the Vite frontend when a frontend service is built from this
-# Compose project.
-export VITE_CART_NAME="$CART_NAME"
-export VITE_DASHBOARD_API_ROOT="${DASHBOARD_ROOT}/"
+dashboard_configure "$@"
+dashboard_start_registration
 
 echo "Starting anomaly detection with:"
 echo "  CART_NAME=${CART_NAME}"
@@ -107,19 +34,17 @@ echo "  CART_PORT=${CART_PORT}"
 ###############################################################################
 
 BROWSER_PID=""
-REREGISTER_PID=""
 
 cleanup() {
   echo
   echo "Cleaning up launcher background processes..."
 
-  if [ -n "$BROWSER_PID" ]; then
+  if [ -n "${BROWSER_PID:-}" ]; then
     kill "$BROWSER_PID" 2>/dev/null || true
+    wait "$BROWSER_PID" 2>/dev/null || true
   fi
 
-  if [ -n "$REREGISTER_PID" ]; then
-    kill "$REREGISTER_PID" 2>/dev/null || true
-  fi
+  dashboard_stop_registration
 }
 
 trap cleanup EXIT
@@ -132,78 +57,6 @@ trap 'exit 130' SIGINT SIGTERM
 bash ./initialize_host.sh
 
 ###############################################################################
-# Dashboard registration
-###############################################################################
-
-REREGISTER_INTERVAL_SEC="${REREGISTER_INTERVAL_SEC:-15}"
-REGISTER_COOLDOWN_SEC="${REGISTER_COOLDOWN_SEC:-15}"
-
-dashboard_up() {
-  # -k allows the dashboard's self-signed HTTPS certificate.
-  curl -k -fsS \
-    --connect-timeout 3 \
-    --max-time 5 \
-    "${DASHBOARD_ROOT}/" \
-    >/dev/null 2>&1
-}
-
-register_cart() {
-  local payload
-
-  payload="$(
-    printf \
-      '{"name":"%s","port":%s}' \
-      "$CART_NAME" \
-      "$CART_PORT"
-  )"
-
-  curl -k -fsS \
-    --connect-timeout 3 \
-    --max-time 5 \
-    -X POST \
-    "${DASHBOARD_ROOT}/api/vehicles/register" \
-    -H "Content-Type: application/json" \
-    -d "$payload" \
-    >/dev/null 2>&1
-}
-
-reregister_loop() {
-  local last_ok=0
-  local dashboard_was_up=false
-
-  while true; do
-    if dashboard_up; then
-      local now
-      now="$(date +%s)"
-
-      if [ "$dashboard_was_up" = false ]; then
-        echo "[Dashboard] Connected to ${DASHBOARD_ROOT}"
-        dashboard_was_up=true
-      fi
-
-      if (( now - last_ok >= REGISTER_COOLDOWN_SEC )); then
-        if register_cart; then
-          last_ok="$now"
-        else
-          echo "[Dashboard] Cart registration failed"
-        fi
-      fi
-    else
-      if [ "$dashboard_was_up" = true ]; then
-        echo "[Dashboard] Connection lost"
-      fi
-
-      dashboard_was_up=false
-    fi
-
-    sleep "$REREGISTER_INTERVAL_SEC"
-  done
-}
-
-reregister_loop &
-REREGISTER_PID=$!
-
-###############################################################################
 # Browser helper
 ###############################################################################
 
@@ -212,6 +65,7 @@ wait_for_anomaly_frontend() {
 
   until curl -fsS \
     --connect-timeout 2 \
+    --max-time 5 \
     "http://localhost:${port}" \
     >/dev/null 2>&1
   do
@@ -221,16 +75,17 @@ wait_for_anomaly_frontend() {
 
 open_browser_when_ready() {
   local port="$1"
+  local frontend_url="http://localhost:${port}"
 
   wait_for_anomaly_frontend "$port"
 
   if command -v xdg-open >/dev/null 2>&1; then
-    xdg-open "http://localhost:${port}" >/dev/null 2>&1
+    xdg-open "$frontend_url" >/dev/null 2>&1 || true
   elif command -v open >/dev/null 2>&1; then
-    open "http://localhost:${port}"
+    open "$frontend_url" >/dev/null 2>&1 || true
   else
     echo "Anomaly interface is available at:"
-    echo "  http://localhost:${port}"
+    echo "  ${frontend_url}"
   fi
 }
 
