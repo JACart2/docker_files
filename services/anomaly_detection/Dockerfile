@@ -9,6 +9,7 @@ SHELL ["/bin/bash", "-lc"]
 ENV DEBIAN_FRONTEND=noninteractive
 ARG ROS_WS=/opt/ros_ws
 ARG ANOMALY_DETECTION_REF=main
+ARG OLLAMA_VERSION=0.30.6
 
 # nvidia-container-runtime & serial_number for cam
 ENV NVIDIA_VISIBLE_DEVICES=all
@@ -38,9 +39,11 @@ RUN set -eux; \
     rm -rf /var/lib/apt/lists/*
 
 # Install the Ollama server/CLI used by the anomaly detection node.
-RUN curl -fsSL https://ollama.com/install.sh | sh
+RUN curl -fsSL https://ollama.com/install.sh | \
+    OLLAMA_VERSION="${OLLAMA_VERSION}" sh
 
-# Download Mistral through a BuildKit cache, then copy it into the image.
+# Download the QAT Gemma 4 12B vision model through a BuildKit cache, then
+# copy it into the image.
 RUN --mount=type=cache,target=/tmp/ollama-cache \
     set -eux; \
     export OLLAMA_MODELS=/tmp/ollama-cache/models; \
@@ -52,7 +55,7 @@ RUN --mount=type=cache,target=/tmp/ollama-cache \
         fi; \
         sleep 1; \
     done; \
-    ollama pull mistral; \
+    ollama pull gemma4:12b-it-qat; \
     mkdir -p /root/.ollama; \
     rm -rf /root/.ollama/models; \
     cp -a /tmp/ollama-cache/models /root/.ollama/models; \

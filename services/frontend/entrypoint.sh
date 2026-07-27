@@ -8,8 +8,10 @@ git config --global --add safe.directory /root/ui
 
 # Optional: update if it's a git repo
 if [ -d ".git" ]; then
+  current_branch="$(git branch --show-current)"
   echo "Updating UI from GitHub..."
-  git pull origin main || echo "Warning: Git pull failed, using existing code."
+  git pull --ff-only origin "$current_branch" ||
+    echo "Warning: Git pull failed, using existing code."
 fi
 
 echo "Installing npm dependencies..."
