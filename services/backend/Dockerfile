@@ -122,7 +122,9 @@ RUN git clone --filter=blob:none --no-checkout https://github.com/JACart2/anomal
       anomaly_msg/package.xml && \
     rm -rf /tmp/anomaly_detection
 RUN git clone --recursive --depth 1 --branch "${ZED_ROS2_WRAPPER_TAG}" https://github.com/stereolabs/zed-ros2-wrapper.git
-RUN git clone https://github.com/stereolabs/zed-ros2-examples.git
+ARG ZED_ROS2_EXAMPLES_REF=3ee3f69449b93413cb8f201e97fbe0bb19554709
+RUN git clone --filter=blob:none --no-checkout https://github.com/stereolabs/zed-ros2-examples.git && \
+    git -C zed-ros2-examples checkout --detach "${ZED_ROS2_EXAMPLES_REF}"
 
 # Used for mapping and loop closure. This is a fork of the original MOLA repo with some modifications to make it work with ROS2.
 WORKDIR ${ROS_WS}
