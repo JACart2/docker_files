@@ -28,22 +28,6 @@ RUN set -eux; \
         ros-jazzy-tf-transformations \
         ros-jazzy-pointcloud-to-laserscan \
         ros-jazzy-swri-console \
-        libflann-dev \
-        liblz4-dev \
-        libtbb-dev \
-        ros-jazzy-gtsam \
-        ros-jazzy-mola-common \
-        ros-jazzy-mola-georeferencing \
-        ros-jazzy-mola-gtsam-factors \
-        ros-jazzy-mola-metric-maps \
-        ros-jazzy-mola-pose-list \
-        ros-jazzy-mola-relocalization \
-        ros-jazzy-mola-test-datasets \
-        ros-jazzy-mola-yaml \
-        ros-jazzy-mp2p-icp \
-        ros-jazzy-mrpt-libgui \
-        ros-jazzy-mrpt-libmaps \
-        ros-jazzy-mrpt-libtclap \
         python3-transforms3d \
         python3-networkx \
         python3-serial \
