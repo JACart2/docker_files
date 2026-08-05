@@ -96,6 +96,9 @@ RUN set -eux; \
       ros-jazzy-mola-viz \
       ros-jazzy-mola-yaml \
       ros-jazzy-mp2p-icp \
+      ros-jazzy-mrpt-libgui \
+      ros-jazzy-mrpt-libmaps \
+      ros-jazzy-mrpt-libtclap \
       ros-jazzy-rosbag2-storage-mcap \
       ros-jazzy-velodyne-driver \
       ros-jazzy-velodyne-pointcloud \
