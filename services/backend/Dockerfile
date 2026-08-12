@@ -157,7 +157,7 @@ RUN rosdep init || true && rosdep update
 
 # Get maps and Calibration Files
 RUN mkdir -p /maps && \
-    wget -q -r -np -nd -l1 -P /maps -A "*.yaml,*.pcd" https://w3.cs.jmu.edu/spragunr/rosmaps/
+    wget -q -r -np -nd -l1 -P /maps -A "*.yaml,*.pcd, *.mm" https://w3.cs.jmu.edu/spragunr/rosmaps/
 
 RUN wget -O /root/student_auth_setup.sh https://raw.githubusercontent.com/JACart2/docker_files/main/student_auth_setup.sh && \
     chmod +x /root/student_auth_setup.sh
