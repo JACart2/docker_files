@@ -5,7 +5,9 @@ pydantic
 numpy==1.26.4
 litellm
 ollama
-flask
+flask>=3.0.0
+flask-cors>=4.0.0
+werkzeug>=3.0.0
 flask-socketio
 eventlet
 opencv-python
@@ -19,3 +21,4 @@ cv-bridge
 # argon2-cffi
 # python-dotenv
 # transforms3d==0.4.1
+

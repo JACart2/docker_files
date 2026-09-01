@@ -50,7 +50,7 @@ services:
     build:
       context: ./services/anomaly_detection
       dockerfile: ./Dockerfile
-    command: ros2 run anomaly_detection anomaly_detection_node
+    command: ros2 run anomaly_detection bag_recorder_ui_node
     environment:
       - ANOMALY_AUTOSTART=${ANOMALY_AUTOSTART:-true}
       - ANOMALY_DETECTION_COMMAND # allows for default command override from entrypoint.sh

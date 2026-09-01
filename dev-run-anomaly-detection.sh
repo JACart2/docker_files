@@ -8,10 +8,14 @@ set -euo pipefail
 #   ./dev-run-anomaly-detection.sh mycart 7
 #   CART_NAME=mycart ROS_DOMAIN_ID=7 ./dev-run-anomaly-detection.sh
 #
+# Execution Modes (ANOMALY_MODE):
+#   ANOMALY_MODE=bag_ui ./dev-run-anomaly-detection.sh   # Run Bag Recorder UI & launch Chrome on :5000
+#   ANOMALY_MODE=node   ./dev-run-anomaly-detection.sh   # Run standard anomaly detection node
+#   ANOMALY_MODE=launch ./dev-run-anomaly-detection.sh   # Run full anomaly detection launchfile
+#
 # Optional:
 #   ANOMALY_AUTOSTART=true ./dev-run-anomaly-detection.sh
-#   ANOMALY_MODE=node ./dev-run-anomaly-detection.sh
-#   ANOMALY_MODE=launch ./dev-run-anomaly-detection.sh
+#   RECORDER_PORT=5000 ./dev-run-anomaly-detection.sh
 #
 # Dashboard overrides:
 #   SERVER_IP=10.247.225.41 API_PORT=8000 ./dev-run-anomaly-detection.sh
@@ -22,12 +26,15 @@ source ./dashboard-api.sh
 dashboard_configure "$@"
 dashboard_start_registration
 
+RECORDER_PORT="${RECORDER_PORT:-5000}"
+
 echo "Starting anomaly detection with:"
 echo "  CART_NAME=${CART_NAME}"
 echo "  CART_ID=${CART_ID}"
 echo "  ROS_DOMAIN_ID=${ROS_DOMAIN_ID}"
 echo "  DASHBOARD_ROOT=${DASHBOARD_ROOT}"
 echo "  CART_PORT=${CART_PORT}"
+echo "  RECORDER_PORT=${RECORDER_PORT}"
 
 ###############################################################################
 # Background-process cleanup
@@ -57,10 +64,10 @@ trap 'exit 130' SIGINT SIGTERM
 bash ./initialize_host.sh
 
 ###############################################################################
-# Browser helper
+# Chrome / Browser Helper
 ###############################################################################
 
-wait_for_anomaly_frontend() {
+wait_for_service() {
   local port="$1"
 
   until curl -fsS \
@@ -69,23 +76,34 @@ wait_for_anomaly_frontend() {
     "http://localhost:${port}" \
     >/dev/null 2>&1
   do
-    sleep 2
+    sleep 1
   done
 }
 
-open_browser_when_ready() {
+open_chrome_when_ready() {
   local port="$1"
-  local frontend_url="http://localhost:${port}"
+  local target_url="http://localhost:${port}"
 
-  wait_for_anomaly_frontend "$port"
+  wait_for_service "$port"
 
-  if command -v xdg-open >/dev/null 2>&1; then
-    xdg-open "$frontend_url" >/dev/null 2>&1 || true
+  echo "Launching browser for Bag Recorder UI at ${target_url}..."
+
+  if command -v google-chrome >/dev/null 2>&1; then
+    google-chrome --new-window "$target_url" >/dev/null 2>&1 &
+  elif command -v google-chrome-stable >/dev/null 2>&1; then
+    google-chrome-stable --new-window "$target_url" >/dev/null 2>&1 &
+  elif command -v chromium-browser >/dev/null 2>&1; then
+    chromium-browser --new-window "$target_url" >/dev/null 2>&1 &
+  elif command -v chromium >/dev/null 2>&1; then
+    chromium --new-window "$target_url" >/dev/null 2>&1 &
+  elif command -v xdg-open >/dev/null 2>&1; then
+    xdg-open "$target_url" >/dev/null 2>&1 &
   elif command -v open >/dev/null 2>&1; then
-    open "$frontend_url" >/dev/null 2>&1 || true
+    open "$target_url" >/dev/null 2>&1 &
   else
-    echo "Anomaly interface is available at:"
-    echo "  ${frontend_url}"
+    echo "========================================================"
+    echo " Bag Recorder UI ready at: ${target_url}"
+    echo "========================================================"
   fi
 }
 
@@ -116,10 +134,18 @@ else
 fi
 
 ###############################################################################
-# Anomaly detection command
+# Execution Mode & Command Setup
 ###############################################################################
 
-ANOMALY_AUTOSTART="${ANOMALY_AUTOSTART:-false}"
+# Default mode is launch for standalone recording without LLM analysis
+ANOMALY_MODE="${ANOMALY_MODE:-launch}"
+
+# Autostart by default for launch and bag_ui modes
+if [ "$ANOMALY_MODE" = "launch" ] || [ "$ANOMALY_MODE" = "bag_ui" ] || [ "$ANOMALY_MODE" = "recorder" ]; then
+  ANOMALY_AUTOSTART="${ANOMALY_AUTOSTART:-true}"
+else
+  ANOMALY_AUTOSTART="${ANOMALY_AUTOSTART:-false}"
+fi
 
 ANOMALY_PACKAGE_PATHS=(
   "src/anomaly_detection/anomaly_msg"
@@ -136,6 +162,10 @@ colcon build \
   --base-paths ${ANOMALY_BASE_PATHS} && \
 source install/setup.bash"
 
+BAG_RECORDER_UI_NODE="\
+${ANOMALY_BUILD_AND_SOURCE} && \
+ros2 run anomaly_detection bag_recorder_ui_node"
+
 ANOMALY_DETECTION_NODE="\
 ${ANOMALY_BUILD_AND_SOURCE} && \
 ros2 run anomaly_detection anomaly_detection_node"
@@ -144,11 +174,12 @@ ANOMALY_DETECTION_LAUNCH="\
 ${ANOMALY_BUILD_AND_SOURCE} && \
 ros2 launch anomaly_detection anomaly_detection.launch.py"
 
-ANOMALY_MODE="${ANOMALY_MODE:-launch}"
-
 case "$ANOMALY_AUTOSTART" in
   true)
     case "$ANOMALY_MODE" in
+      bag_ui|recorder)
+        ANOMALY_COMMAND="$BAG_RECORDER_UI_NODE"
+        ;;
       node)
         ANOMALY_COMMAND="$ANOMALY_DETECTION_NODE"
         ;;
@@ -157,7 +188,7 @@ case "$ANOMALY_AUTOSTART" in
         ;;
       *)
         echo "Invalid ANOMALY_MODE '${ANOMALY_MODE}'."
-        echo "Valid values are 'node' and 'launch'."
+        echo "Valid values are: 'bag_ui', 'node', 'launch'."
         exit 1
         ;;
     esac
@@ -185,7 +216,7 @@ else
 fi
 
 ###############################################################################
-# Start anomaly detection
+# Start Container & Launch Browser
 ###############################################################################
 
 docker compose up \
@@ -193,45 +224,13 @@ docker compose up \
   "${COMPOSE_FLAGS[@]}" \
   anomaly_detection
 
-if [ "$ANOMALY_AUTOSTART" = "true" ] && [ "$ANOMALY_MODE" = "launch" ]; then
-  open_browser_when_ready 5000 &
+if [ "$ANOMALY_AUTOSTART" = "true" ] && { [ "$ANOMALY_MODE" = "bag_ui" ] || [ "$ANOMALY_MODE" = "recorder" ] || [ "$ANOMALY_MODE" = "launch" ]; }; then
+  open_chrome_when_ready "$RECORDER_PORT" &
   BROWSER_PID=$!
 fi
 
 ###############################################################################
-# Open VS Code attached to the anomaly container
-###############################################################################
-
-if command -v code >/dev/null 2>&1; then
-  CONTAINER_ID="$(
-    docker compose ps -q anomaly_detection
-  )"
-
-  if [ -n "$CONTAINER_ID" ]; then
-    CONTAINER_NAME="$(
-      docker inspect \
-        --format '{{.Name}}' \
-        "$CONTAINER_ID" |
-        sed 's|^/||'
-    )"
-
-    if [ -n "$CONTAINER_NAME" ]; then
-      HEX_NAME="$(
-        printf '%s' "$CONTAINER_NAME" |
-          od -A n -t x1 |
-          tr -d ' \n'
-      )"
-
-      URI="vscode-remote://attached-container+${HEX_NAME}/root/dev_ws"
-
-      echo "Opening VS Code attached to ${CONTAINER_NAME}..."
-      code --folder-uri "$URI"
-    fi
-  fi
-fi
-
-###############################################################################
-# Attach terminal
+# Attach Interactive Terminal
 ###############################################################################
 
 docker compose exec \
