@@ -137,8 +137,8 @@ fi
 # Execution Mode & Command Setup
 ###############################################################################
 
-# Default mode is launch for standalone recording without LLM analysis
-ANOMALY_MODE="${ANOMALY_MODE:-launch}"
+# Default mode is bag_ui for standalone recording without LLM analysis
+ANOMALY_MODE="${ANOMALY_MODE:-bag_ui}"
 
 # Autostart by default for launch and bag_ui modes
 if [ "$ANOMALY_MODE" = "launch" ] || [ "$ANOMALY_MODE" = "bag_ui" ] || [ "$ANOMALY_MODE" = "recorder" ]; then
@@ -224,10 +224,17 @@ docker compose up \
   "${COMPOSE_FLAGS[@]}" \
   anomaly_detection
 
-if [ "$ANOMALY_AUTOSTART" = "true" ] && { [ "$ANOMALY_MODE" = "bag_ui" ] || [ "$ANOMALY_MODE" = "recorder" ] || [ "$ANOMALY_MODE" = "launch" ]; }; then
+if [ "$ANOMALY_AUTOSTART" = "true" ] && { [ "$ANOMALY_MODE" = "bag_ui" ] || [ "$ANOMALY_MODE" = "recorder" ]; }; then
   open_chrome_when_ready "$RECORDER_PORT" &
   BROWSER_PID=$!
+elif [ "$ANOMALY_AUTOSTART" = "true" ] && [ "$ANOMALY_MODE" = "launch" ]; then
+  open_chrome_when_ready 5001 &
+  BROWSER_PID=$!
 fi
+
+###############################################################################
+# Attach Interactive Terminal
+###############################################################################
 
 ###############################################################################
 # Attach Interactive Terminal
