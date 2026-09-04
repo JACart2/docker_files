@@ -137,8 +137,8 @@ fi
 # Execution Mode & Command Setup
 ###############################################################################
 
-# Default mode is bag_ui for standalone recording without LLM analysis
-ANOMALY_MODE="${ANOMALY_MODE:-bag_ui}"
+# Default mode is launch (runs full LLM anomaly detection)
+ANOMALY_MODE="${ANOMALY_MODE:-launch}"
 
 # Autostart by default for launch and bag_ui modes
 if [ "$ANOMALY_MODE" = "launch" ] || [ "$ANOMALY_MODE" = "bag_ui" ] || [ "$ANOMALY_MODE" = "recorder" ]; then
@@ -231,10 +231,6 @@ elif [ "$ANOMALY_AUTOSTART" = "true" ] && [ "$ANOMALY_MODE" = "launch" ]; then
   open_chrome_when_ready 5001 &
   BROWSER_PID=$!
 fi
-
-###############################################################################
-# Attach Interactive Terminal
-###############################################################################
 
 ###############################################################################
 # Attach Interactive Terminal
