@@ -56,7 +56,6 @@ services:
       - ANOMALY_DETECTION_COMMAND # allows for default command override from entrypoint.sh
       - CART_ID=${CART_ID:-james}
       - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
-      - ROS_BAG_PATH=${ROS_BAG_PATH:-/root/dev_ws/bags/anomaly_20260722_154508}
       - ROS_BAG_LOOP=${ROS_BAG_LOOP:-true}
       - ROS_BAG_RATE=${ROS_BAG_RATE:-1.0}
     volumes:
