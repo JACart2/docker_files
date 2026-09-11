@@ -52,6 +52,7 @@ services:
       dockerfile: ./Dockerfile
     command: ros2 run anomaly_detection bag_recorder_ui_node
     environment:
+      - BAG_RECORD_TOPICS=${BAG_RECORD_TOPICS}
       - ANOMALY_AUTOSTART=${ANOMALY_AUTOSTART:-true}
       - ANOMALY_DETECTION_COMMAND # allows for default command override from entrypoint.sh
       - CART_ID=${CART_ID:-james}

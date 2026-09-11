@@ -147,7 +147,7 @@ dashboard_registration_loop() {
             if ((current_time - last_success >= REGISTER_COOLDOWN_SEC)); then
                 if dashboard_register_cart; then
                     last_success="$current_time"
-                    echo "[Dashboard] Registered ${CART_NAME}"
+                    # echo "[Dashboard] Registered ${CART_NAME}"
                 else
                     echo "[Dashboard] Registration failed for ${CART_NAME}"
                 fi

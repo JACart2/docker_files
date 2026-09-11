@@ -28,6 +28,9 @@ dashboard_start_registration
 
 RECORDER_PORT="${RECORDER_PORT:-5000}"
 
+# Topics recorded when running the Bag UI
+export BAG_RECORD_TOPICS="${BAG_RECORD_TOPICS:-/ai_anomaly_logging}"
+
 echo "Starting anomaly detection with:"
 echo "  CART_NAME=${CART_NAME}"
 echo "  CART_ID=${CART_ID}"
@@ -35,6 +38,7 @@ echo "  ROS_DOMAIN_ID=${ROS_DOMAIN_ID}"
 echo "  DASHBOARD_ROOT=${DASHBOARD_ROOT}"
 echo "  CART_PORT=${CART_PORT}"
 echo "  RECORDER_PORT=${RECORDER_PORT}"
+echo "  BAG_RECORD_TOPICS=${BAG_RECORD_TOPICS}"
 
 ###############################################################################
 # Background-process cleanup
