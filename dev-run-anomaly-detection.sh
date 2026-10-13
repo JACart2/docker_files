@@ -237,6 +237,39 @@ elif [ "$ANOMALY_AUTOSTART" = "true" ] && [ "$ANOMALY_MODE" = "launch" ]; then
 fi
 
 ###############################################################################
+# Open VS Code attached to the anomaly container
+###############################################################################
+
+if command -v code >/dev/null 2>&1; then
+  CONTAINER_ID="$(
+    docker compose ps -q anomaly_detection
+  )"
+
+  if [ -n "$CONTAINER_ID" ]; then
+    CONTAINER_NAME="$(
+      docker inspect \
+        --format '{{.Name}}' \
+        "$CONTAINER_ID" |
+        sed 's|^/||'
+    )"
+
+    if [ -n "$CONTAINER_NAME" ]; then
+      # VS Code requires the container name to be hex-encoded for the URI
+      HEX_NAME="$(
+        printf '%s' "$CONTAINER_NAME" |
+          od -A n -t x1 |
+          tr -d ' \n'
+      )"
+
+      URI="vscode-remote://attached-container+${HEX_NAME}/root/dev_ws"
+
+      echo "Opening VS Code attached to ${CONTAINER_NAME}..."
+      code --folder-uri "$URI"
+    fi
+  fi
+fi
+
+###############################################################################
 # Attach Interactive Terminal
 ###############################################################################
 
