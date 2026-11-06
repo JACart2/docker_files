@@ -10,7 +10,8 @@ services:
     command: ros2 launch cart_launch autonomous_launcher.launch.py #can be overriden with $BACKEND_COMMAND
     environment:
       - BACKEND_COMMAND #will override the default command above
-      - ROS_DOMAIN_ID=0
+      - CART_ID=${CART_ID:-james}
+      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
       - $HOME/.ssh:/root/.ssh
       - $HOME/.gitconfig:/root/.gitconfig
       - DISPLAY
@@ -35,6 +36,8 @@ services:
     command: npm run dev
     environment:
       - FRONTEND_COMMAND #will override the default command above
+      - VITE_CART_NAME=${VITE_CART_NAME}
+      - VITE_DASHBOARD_API_ROOT=${VITE_DASHBOARD_API_ROOT}
       - $HOME/.gitconfig:/root/.gitconfig
     network_mode: "host"
     volumes:
@@ -47,25 +50,19 @@ services:
     build:
       context: ./services/anomaly_detection
       dockerfile: ./Dockerfile
-    depends_on:
-      - backend
     command: ros2 run anomaly_detection anomaly_detection_node
     environment:
+      - ANOMALY_AUTOSTART=${ANOMALY_AUTOSTART:-true}
       - ANOMALY_DETECTION_COMMAND # allows for default command override from entrypoint.sh
-      - ROS_DOMAIN_ID=0
+      - CART_ID=${CART_ID:-james}
+      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
+      - ROS_BAG_PATH=${ROS_BAG_PATH:-/root/dev_ws/bags/anomaly_20260722_154508}
+      - ROS_BAG_LOOP=${ROS_BAG_LOOP:-true}
+      - ROS_BAG_RATE=${ROS_BAG_RATE:-1.0}
     volumes:
       - type: bind
-        source: $HOME/dev_ws/
-        target: /root/dev_ws/
-      ## sourcing from /root/dev_ws fails to find this folder with existing install dir. This compensates for that. This dir exists in backend b/c it is built, but here we need to copy it over.
-      - type: bind
-        source: $HOME/dev_ws/
-        target: /opt/ros_ws
-      ## this is the ollama cli container can use to serve and kill LLM instance
-      - type: bind 
-        source: /usr/local/bin/ollama
-        target: /usr/local/bin/ollama
-
+        source: $HOME/dev_ws
+        target: /root/dev_ws
     privileged: true
     runtime: nvidia
     network_mode: "host"
