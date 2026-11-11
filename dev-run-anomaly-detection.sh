@@ -151,19 +151,9 @@ else
   ANOMALY_AUTOSTART="${ANOMALY_AUTOSTART:-false}"
 fi
 
-ANOMALY_PACKAGE_PATHS=(
-  "src/anomaly_detection/anomaly_msg"
-  "src/anomaly_detection/anomaly_detection"
-  "src/anomaly_detection/tester"
-)
-
-ANOMALY_BASE_PATHS="${ANOMALY_PACKAGE_PATHS[*]}"
-
 ANOMALY_BUILD_AND_SOURCE="\
 cd /root/dev_ws && \
-colcon build \
-  --symlink-install \
-  --base-paths ${ANOMALY_BASE_PATHS} && \
+colcon build --symlink-install && \
 source install/setup.bash"
 
 BAG_RECORDER_UI_NODE="\
